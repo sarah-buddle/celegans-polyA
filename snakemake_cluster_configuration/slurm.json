@@ -1,7 +1,7 @@
 # follow instructions on github account sent by Cristian
 # profile_name: snakemake_profile
 # sbatch_defaults: account=sb2226
-# cluster_config: scripts/slurm.json (below)
+# cluster_config: snakemake_profile/slurm.json (below)
 # Select advanced_argument_conversion: 1
 # cluster_name: (leave this blank)
 # this works to submit to cluster, but repeatedly prints message in screenshot
