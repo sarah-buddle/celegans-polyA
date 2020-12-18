@@ -88,3 +88,9 @@ conda create --name gffcompare=0.11.2 --channel conda-forge --channel bioconda -
 conda activate gffcompare=0.11.2
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/gffcompare=0.11.2.yaml
 conda deactivate
+
+# rclone (first two lines also on local machine)
+conda create --name rclone=1.53.1 --channel conda-forge --yes rclone=1.53.1
+conda activate rclone=1.53.1
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/rclone=1.53.1
+conda deactivate
