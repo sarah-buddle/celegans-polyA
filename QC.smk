@@ -55,9 +55,11 @@ rule fastqc_untrimmed:
         polyA/QC/fastqc_untrimmed/zip/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/reads{wildcards.reads}/;'
         'rmdir polyA/QC/fastqc_untrimmed/tempdir'
 
+'''
 snakemake --use-conda --cores 1 --snakefile rules/fastqc_untrimmed.smk \
 polyA/QC/fastqc_untrimmed/reports/bristol/as/rep1/reads1/bristol_as_rep1_1_fastqc.html \
 polyA/QC/fastqc_untrimmed/zip/bristol/as/rep1/reads1/bristol_as_rep1_1_fastqc.zip
+'''
 
 rule multiqc_untrimmed:
     ''' Combine fastqc reports on untrimmed reads '''
@@ -69,13 +71,12 @@ rule multiqc_untrimmed:
     conda:
         '../envs/conda/multiqc=1.9.yaml'
     shell:
-        'multiqc {input} -o '
+        'multiqc {input} -o polyA/QC/multiqc_untrimmed/'
 
-rule export_QC_reports:
-    ''' Put QC reports into a single folder for export to local machine for viewing '''
-    input:
-        fastqc_html='polyA/QC/fastqc_untrimmed/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.html'
-        fastqc_zip='polyA/QC/fastqc_untrimmed/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.zip'
+'''
+snakemake --cores 1 --use-conda --snakefile rules/multiqc_untrimmed.smk \
+polyA/QC/multiqc_untrimmed/untrimmed_multiqc{.html,_data}
+'''
 
 rule cutadapt:
     ''' Trims adaptors and low quality sequences, discards reads shorter than 40nt'''
@@ -91,3 +92,33 @@ rule cutadapt:
         -A GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTTAGTCCACGTGTAGATCTCGGTGGTCGCCGTATCATTAAAAAA \
         -o {output.trimmed1} -p {output.trimmed2} \
         {input.reads1} {input.reads2}"
+
+rule fastqc_trimmed:
+    ''' Perform fastqc to check quality of trimmed reads '''
+    input:
+        'polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_trimmed.fastq'
+    output:
+        html='polyA/QC/fastqc_trimmed/reports/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_trimmed_fastqc.html',
+        zip='polyA/QC/fastqc_trimmed/zip/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_trimmed_fastqc.zip'
+    conda:
+        '../envs/conda/fastqc=0.11.9.yaml'
+    shell:
+        'mkdir polyA/QC/fastqc_trimmed/tempdir;'
+        'fastqc {input} --outdir polyA/QC/fastqc_trimmed/tempdir;'
+        'mv polyA/QC/fastqc_trimmed/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_trimmed_fastqc.html \
+        polyA/QC/fastqc_trimmed/reports/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/reads{wildcards.reads}/;'
+        'mv polyA/QC/fastqc_trimmed/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_trimmed_fastqc.zip \
+        polyA/QC/fastqc_trimmed/zip/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/reads{wildcards.reads}/;'
+        'rmdir polyA/QC/fastqc_trimmed/tempdir'
+
+rule multiqc_trimmed:
+    ''' Combine fastqc reports on trimmed reads '''
+    input:
+        'polyA/QC/fastqc_trimmed'
+    output:
+        data='polyA/QC/multiqc_trimmed/trimmed_multiqc_data'
+        report='polyA/QC/multiqc_trimmed/trimmed_multiqc.html'
+    conda:
+        '../envs/conda/multiqc=1.9.yaml'
+    shell:
+        'multiqc {input} -o polyA/QC/multiqc_trimmed/'
