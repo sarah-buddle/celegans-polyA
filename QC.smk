@@ -42,12 +42,22 @@ rule fastqc_untrimmed:
     input:
         'polyA/QC/deinterleaved_fastq/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.fastq'
     output:
-        html='polyA/QC/fastqc_untrimmed/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.html'
-        zip='polyA/QC/fastqc_untrimmed/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.zip'
+        html='polyA/QC/fastqc_untrimmed/reports/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_fastqc.html',
+        zip='polyA/QC/fastqc_untrimmed/zip/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_fastqc.zip'
     conda:
         '../envs/conda/fastqc=0.11.9.yaml'
     shell:
-        'fastqc {input} -o polyA/QC/fastqc_untrimmed'
+        'mkdir polyA/QC/fastqc_untrimmed/tempdir;'
+        'fastqc {input} --outdir polyA/QC/fastqc_untrimmed/tempdir;'
+        'mv polyA/QC/fastqc_untrimmed/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_fastqc.html \
+        polyA/QC/fastqc_untrimmed/reports/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/reads{wildcards.reads}/;'
+        'mv polyA/QC/fastqc_untrimmed/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_fastqc.zip \
+        polyA/QC/fastqc_untrimmed/zip/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/reads{wildcards.reads}/;'
+        'rmdir polyA/QC/fastqc_untrimmed/tempdir'
+
+snakemake --use-conda --cores 1 --snakefile rules/fastqc_untrimmed.smk \
+polyA/QC/fastqc_untrimmed/reports/bristol/as/rep1/reads1/bristol_as_rep1_1_fastqc.html \
+polyA/QC/fastqc_untrimmed/zip/bristol/as/rep1/reads1/bristol_as_rep1_1_fastqc.zip
 
 rule multiqc_untrimmed:
     ''' Combine fastqc reports on untrimmed reads '''
@@ -59,7 +69,7 @@ rule multiqc_untrimmed:
     conda:
         '../envs/conda/multiqc=1.9.yaml'
     shell:
-        'multiqc {input}'
+        'multiqc {input} -o '
 
 rule export_QC_reports:
     ''' Put QC reports into a single folder for export to local machine for viewing '''
