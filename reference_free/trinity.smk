@@ -10,7 +10,7 @@ rule trinity:
     shell:
         "Trinity --seqType fq --max_memory 60G --CPU {threads} \
         --left {input.trimmed1} --right {input.trimmed2} \
-        --output polyA/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/"
+        --output polyA/reference_free/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/"
 
 snakemake --use-conda --cores 24 --snakefile rules/trinity.smk \
 polyA/reference_free/trinity/bristol/hb101/rep1/trinity/Trinity.fasta
