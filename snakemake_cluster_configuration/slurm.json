@@ -1,0 +1,23 @@
+# follow instructions on github account sent by Cristian
+# profile_name: snakemake_profile
+# sbatch_defaults: account=sb2226
+# cluster_config: snakemake_profile/slurm.json (below)
+# Select advanced_argument_conversion: 1
+# cluster_name: (leave this blank)
+# this works to submit to cluster, but repeatedly prints message in screenshot
+# by default would have "A" = "overall" above nodes, but this throws an error
+# changing cpus to "{threads}", and putting threads in Snakefile fails with exit code 1
+{
+    "__default__" :
+    {
+        "nodes": 1,
+        "ntasks": 1,
+        "cpus" : 1,
+        "partition" : "IACT",
+        "job-name" : "{rule}{wildcards}",
+        "output": "slurm/output/{rule}/{wildcards}.o",
+        "error": "slurm/error/{rule}/{wildcards}.e",
+        "mail-user": "sb2226@cam.ac.uk",
+        "mail-type": "ALL"
+    }
+}
