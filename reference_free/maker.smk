@@ -1,10 +1,10 @@
-# running
 rule maker:
     input:
+        genome='polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
         trinity='polyA/reference_free/trinity/{location}/{diet}/{replicate}/trinity/Trinity.fasta',
-        genome='polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked'
+        reference_annotation='input/annotations/liftover/{location}/{location}_annotation.gtf'
     output:
-        'polyA/reference_free/maker/{location}/{diet}/{replicate}/{location}_masked.all.gff'
+        'polyA/reference_free/maker/{location}/{diet}/{replicate}/{location}_genome.fasta.all.gff'
     conda:
         '../envs/conda/maker=2.31.10.yaml'
     threads: 24
@@ -19,17 +19,19 @@ rule maker:
         "sed 's|^genome=|genome=../../../../repeatmasker/{wildcards.location}/{wildcards.location}_genome.fasta.masked|' | "
         # set transcriptome fasta file
         "sed 's|^est=|est=../../../../trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/Trinity.fasta|' | "
+        # uses names from existing liftover annotation where possible
+        "sed 's|^model_gff=|model_gff=../../../../../../input/annotations/liftover/{wildcards.location}/{wildcards.location}_annotation.gtf|' | "
         # disables Repeatmasker because licensing agreement with RepBase broken
         "sed 's|^model_org=all|model_org=|' | "
         # infer gene predictions from transcriptome
         "sed 's|^est2genome=0|est2genome=1|' > maker_opts2.ctl;"
         'mv maker_opts2.ctl maker_opts.ctl;'
-        'maker -cpus {threads} -q; '
-        'gff3_merge -d {wildcards.location}_masked.maker.output/{wildcards.location}_masked_master_datastore_index.log'
+        'maker -cpus {threads} -q;'
+        'gff3_merge -d {wildcards.location}_genome.fasta.maker.output/{wildcards.location}_genome.fasta_master_datastore_index.log'
 
 snakemake --cores 24 --use-conda --snakefile rules/maker.smk \
-polyA/reference_free/maker/bristol/as/rep3/bristol_masked.all.gff
+polyA/reference_free/maker/bristol/as/rep3/bristol_genome.fasta.all.gff
 
 snakemake --cluster-config snakemake_profile/slurm.json --use-conda \
 --profile snakemake_profile --cores 24 --snakefile rules/maker.smk \
-polyA/reference_free/maker/bristol/as/rep3/bristol_masked.all.gff
+polyA/reference_free/maker/bristol/as/rep2/bristol_genome.fasta.all.gff
