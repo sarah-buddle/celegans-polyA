@@ -17,7 +17,7 @@ rule maker_replicates:
         # make adjustments to maker_opts.ctl file
         "cat maker_opts.ctl | "
         # previously produced Maker annotation to be improved
-        "sed 's|^maker_gff=|maker_gff=../rep1/{wildcards.location}_genome.fasta.all.gff|' | "
+        "sed 's|^maker_gff=|maker_gff=../rep3/{wildcards.location}_genome.fasta.all.gff|' | "
         # use ESTs in maker_gff
         "sed 's|^est_pass=0|est_pass=1|' | "
         # keeps names from previous run
@@ -41,4 +41,7 @@ rule maker_replicates:
 
 snakemake --cluster-config snakemake_profile/slurm.json --use-conda \
 --profile snakemake_profile --cores 24 --snakefile rules/maker_replicates.smk \
+polyA/reference_free/maker/bristol/as/rep3_2/bristol_genome.fasta.all.gff
+
+snakemake --cores 24 --use-conda --snakefile rules/maker_replicates.smk \
 polyA/reference_free/maker/bristol/as/rep3_2/bristol_genome.fasta.all.gff
