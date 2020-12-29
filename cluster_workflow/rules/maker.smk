@@ -34,4 +34,4 @@ polyA/reference_free/maker/bristol/as/rep3/bristol_genome.fasta.all.gff
 
 snakemake --cluster-config snakemake_profile/slurm.json --use-conda \
 --profile snakemake_profile --cores 24 --snakefile rules/maker.smk \
-polyA/reference_free/maker/bristol/as/rep2/bristol_genome.fasta.all.gff
+polyA/reference_free/maker/bristol/as/rep3/bristol_genome.fasta.all.gff
