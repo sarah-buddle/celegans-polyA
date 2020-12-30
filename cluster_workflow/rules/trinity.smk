@@ -12,6 +12,7 @@ rule trinity:
         --left {input.trimmed1} --right {input.trimmed2} \
         --output polyA/reference_free/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/"
 
+'''
 snakemake --use-conda --cores 24 --snakefile rules/trinity.smk \
 polyA/reference_free/trinity/bristol/hb101/rep1/trinity/Trinity.fasta
 
@@ -19,3 +20,12 @@ polyA/reference_free/trinity/bristol/hb101/rep1/trinity/Trinity.fasta
 snakemake --cluster-config snakemake_profile/slurm.json --use-conda \
 --profile snakemake_profile --cores 24 --snakefile rules/trinity.smk \
 polyA/reference_free/trinity/bristol/hb101/rep1/trinity/Trinity.fasta
+'''
+
+'''
+# backup output
+cd /Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/trinity
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/polyA/reference_free/trinity/bristol/as/rep3/trinity/Trinity.fasta .
+mv Trinity.fasta trinity_bristol_as_rep3.fasta
+
+'''
