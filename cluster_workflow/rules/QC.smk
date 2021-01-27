@@ -146,7 +146,7 @@ output/polyA/QC/multiqc_trimmed/multiqc_trimmed.html
 '''
 # import all reports to local machine
 scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/fastqc_untrimmed/reports/ \
-/Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/QC/fastqc_untrimmed
+cQC/fastqc_untrimmed
 scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/fastqc_trimmed/reports/ \
 /Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/QC/fastqc_trimmed
 scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/multiqc_untrimmed/multiqc_trimmed.html \
