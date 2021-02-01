@@ -6,5 +6,6 @@ max-jobs-per-second: 1
 max-status-checks-per-second: 10
 local-cores: 1
 latency-wait: 60
-cluster-config: "snakemake_profile/slurm.json"
+cluster-config: "../snakemake_profile/slurm.json"
 use-conda: true
+cores: 24
