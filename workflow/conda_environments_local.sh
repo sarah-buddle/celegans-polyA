@@ -33,7 +33,14 @@ conda activate r-tidyverse=1.2.1
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-tidyverse=1.2.1.yaml
 conda deactivate
 
+# dplyr
 conda create --name r-dplyr=0.8.0.1 --yes r-dplyr=0.8.0.1
 conda activate r-dplyr=0.8.0.1
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-dplyr=0.8.0.1.yaml
+conda deactivate
+
+# topgo
+conda create --name bioconductor-topgo=2.42.0 --channel conda-forge --channel bioconda --yes bioconductor-topgo=2.42.0
+conda create bioconductor-topgo=2.42.0
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-topgo=2.42.0.yaml
 conda deactivate
