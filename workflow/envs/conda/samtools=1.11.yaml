@@ -1,0 +1,23 @@
+name: samtools=1.11
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bzip2=1.0.8
+  - c-ares=1.17.1
+  - ca-certificates=2020.12.5
+  - htslib=1.11
+  - krb5=1.17.2
+  - libcurl=7.71.1
+  - libcxx=11.0.0
+  - libdeflate=1.7
+  - libedit=3.1.20191231
+  - libev=4.33
+  - libnghttp2=1.41.0
+  - libssh2=1.9.0
+  - ncurses=6.2
+  - openssl=1.1.1i
+  - samtools=1.11
+  - tk=8.6.10
+  - xz=5.2.5
