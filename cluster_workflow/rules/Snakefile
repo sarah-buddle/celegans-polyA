@@ -1,8 +1,0 @@
-# QC
-include: 'rules/QC.smk'
-
-# Genome-guided alignment, assembly and read counting
-include: 'rules/genome_guided.smk'
-
-# Reference-free assembly and annotations
-include: 'rules/repeatmasker.smk'
