@@ -32,3 +32,8 @@ conda create --name r-tidyverse=1.2.1 --yes r-tidyverse=1.2.1
 conda activate r-tidyverse=1.2.1
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-tidyverse=1.2.1.yaml
 conda deactivate
+
+conda create --name r-dplyr=0.8.0.1 --yes r-dplyr=0.8.0.1
+conda activate r-dplyr=0.8.0.1
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-dplyr=0.8.0.1.yaml
+conda deactivate
