@@ -92,5 +92,30 @@ conda deactivate
 # rclone (first two lines also on local machine)
 conda create --name rclone=1.53.1 --channel conda-forge --yes rclone=1.53.1
 conda activate rclone=1.53.1
-conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/rclone=1.53.1
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/rclone=1.53.1.yaml
 conda deactivate
+
+# soapdenovo-trans
+conda create --name soapdenovo-trans=1.04 --channel conda-forge --channel bioconda --yes soapdenovo-trans=1.04
+conda activate soapdenovo-trans=1.04
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/soapdenovo-trans=1.04.yaml
+conda deactivate
+
+# rseqc
+conda create --name rseqc=4.0.0 --channel conda-forge --channel bioconda --yes rseqc=4.0.0
+conda activate rseqc=4.0.0
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/rseqc=4.0.0.yaml
+conda deactivate
+
+# local machine (run from workflow folder)
+# also samtools as above
+
+# deseq2
+conda create --name bioconductor-deseq2=1.30.0 --channel conda-forge --channel bioconda --yes bioconductor-deseq2=1.30.0
+conda activate bioconductor-deseq2=1.30.0
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-deseq2=1.30.0.yaml
+conda deactivate
+
+# gff3 sort
+conda create --name gff3sort=0.1.a1a2bc9 --channel conda-forge --channel bioconda --yes gff3sort=0.1.a1a2bc9
+conda activate gff3sort=0.1.a1a2bc9
