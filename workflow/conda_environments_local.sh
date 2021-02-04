@@ -26,3 +26,9 @@ conda create --name bioconductor-rtracklayer=1.50.0 --channel conda-forge --chan
 conda activate bioconductor-rtracklayer=1.50.0
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-rtracklayer=1.50.0.yaml
 conda deactivate
+
+# tidyverse
+conda create --name r-tidyverse=1.2.1 --yes r-tidyverse=1.2.1
+conda activate r-tidyverse=1.2.1
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-tidyverse=1.2.1.yaml
+conda deactivate
