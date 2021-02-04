@@ -1,5 +1,5 @@
 # cluster test
-include 'rules/cluster_test.smk'
+include: 'rules/cluster_test.smk'
 
 # QC
 include: 'rules/QC.smk'
