@@ -1,1 +1,2 @@
 include: 'rules/deseq2.smk'
+include: 'rules/topgo.smk'
