@@ -22,7 +22,7 @@ rule deseq2:
         '../scripts/deseq2.R'
 
 '''
-snakemake --cores 1 --use-conda output/deseq2/altadena_full_dds.RData
+snakemake --cores 1 --use-conda output/deseq2_data/bristol/bristol_full_dds.RData
 '''
 
 rule deseq2_PCA:
@@ -42,7 +42,7 @@ snakemake --cores 1 --use-conda output/deseq2_plots/bristol/bristol_deseq2_pca.p
 '''
 
 rule deseq2_no_m9:
-''' Creates DESeq2 object without m9/starvation diet treatment '''
+    ''' Creates DESeq2 object without m9/starvation diet treatment '''
     input:
         script='scripts/deseq2.R',
         samples='scripts/htseqcount_samples_full.csv',
@@ -105,4 +105,19 @@ rule deseq2_percentage_genes_expressed:
 '''
 snakemake --cores 1 --use-conda \
 output/deseq2_plots/altadena/altadena_percentage_plot.png
+'''
+
+rule de_analysis:
+    input:
+        script='scripts/de_analysis.R',
+        full_dds='output/deseq2_data/{location}/{location}_full_dds.RData'
+    output:
+        dds_res='output/deseq2_data/{location}/{location}_{diet1}_{diet2}.RData'
+    conda:
+        '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
+    script:
+        '../scripts/de_analysis.R'
+
+'''
+snakemake --cores 1 --use-conda output/deseq2_data/bristol/bristol_as_op50.RData
 '''
