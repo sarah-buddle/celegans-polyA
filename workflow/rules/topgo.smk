@@ -48,3 +48,21 @@ rule go_enrichment_test:
 '''
 snakemake --cores 1 --use-conda output/topgo_result/classic/fisher/bristol/bristol_as_op50.RData
 '''
+
+rule topgo_gentable:
+    input:
+        script='scripts/topgo_gentable.R',
+        topgo_data='output/topgo_data/{location}/{location}_{diet1}_{diet2}.RData',
+        topgo_result_classic_fisher='output/topgo_result/classic/fisher/{location}/{location}_{diet1}_{diet2}.RData',
+        topgo_result_classic_ks='output/topgo_result/classic/ks/{location}/{location}_{diet1}_{diet2}.RData',
+        topgo_result_elim_ks='output/topgo_result/elim/ks/{location}/{location}_{diet1}_{diet2}.RData'
+    output:
+        topgo_gentable='output/topgo_gentable/{orderBy}/{location}/{location}_{diet1}_{diet2}.RData'
+    conda:
+        '../envs/conda/bioconductor-topgo=2.42.0.yaml'
+    script:
+        '../scripts/topgo_gentable.R'
+
+'''
+snakemake --cores 1 --use-conda output/topgo_gentable/classicFisher/bristol/bristol_as_op50.RData
+'''
