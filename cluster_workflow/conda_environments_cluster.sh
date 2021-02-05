@@ -116,5 +116,5 @@ conda deactivate
 # bbtools
 conda create --name bbtools=37.62 --channel agbiome --yes bbtools=37.62
 conda activate bbtools=37.62
-conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bbtools=37.62
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bbtools=37.62.yaml
 conda deactivate
