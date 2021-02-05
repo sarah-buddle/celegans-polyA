@@ -112,3 +112,9 @@ conda create --name velvet=1.2.10 --channel conda-forge --channel bioconda --yes
 conda activate velvet=1.2.10
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/velvet=1.2.10.yaml
 conda deactivate
+
+# bbtools
+conda create --name bbtools=37.62 --channel agbiome --yes bbtools=37.62
+conda activate bbtools=37.62
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bbtools=37.62
+conda deactivate
