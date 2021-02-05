@@ -44,3 +44,9 @@ conda create --name bioconductor-topgo=2.42.0 --channel conda-forge --channel bi
 conda create bioconductor-topgo=2.42.0
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-topgo=2.42.0.yaml
 conda deactivate
+
+# GenomicRanges
+conda create --name bioconductor-genomicranges=1.42.0 --channel conda-forge --channel bioconda --yes bioconductor-genomicranges=1.42.0
+conda create bioconductor-genomicranges=1.42.0
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-genomicranges=1.42.0.yaml
+conda deactivate
