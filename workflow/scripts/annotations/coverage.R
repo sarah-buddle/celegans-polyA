@@ -20,19 +20,29 @@ save(coverage, file = snakemake@output$coverage)
 
 # Write output to new row of coverage_table
 
-# Sample name
-#sample_name <- 'soap_bristol_as_rep2'
-sample_name <- paste(snakemake@wildcards$annotation_type, '_',
-                      snakemake@wildcards$location, '_', 
-                      snakemake@wildcards$diet, '_', 
-                      snakemake@wildcards$replicate, sep = "")
+# Forms sample name e.g. soap_bristol_as_rep1 or liftover_bristol
+if(snakemake@wildcards$annotation_type == 'liftover'){
+  sample_name <- paste('liftover_', snakemake@wildcards$location, sep = "")
+  
+  # New row
+  # new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
+  new_row <- c(sample_name, 'liftover', snakemake@wildcards$location, NA, NA, coverage)
+  
+}else{
+  #sample_name <- 'soap_bristol_as_rep2'
+  sample_name <- paste(snakemake@wildcards$annotation_type, '_',
+                        snakemake@wildcards$location, '_', 
+                        snakemake@wildcards$diet, '_', 
+                        snakemake@wildcards$replicate, sep = "")
+  
+  # New row
+  # new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
+  new_row <- c(sample_name, snakemake@wildcards$annotation_type, 
+               snakemake@wildcards$location, snakemake@wildcards$diet, 
+               snakemake@wildcards$replicate, coverage)
+}
 
-# New row
-# new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
-new_row <- c(sample_name, snakemake@wildcards$annotation_type, 
-             snakemake@wildcards$location, snakemake@wildcards$diet, 
-             snakemake@wildcards$replicate, coverage)
-
+# Making or updating coverage_table.txt
 # Checks whether coverage_table.txt file already exists
 if(file.exists('output/annotations/coverage/coverage_table.txt') == TRUE) {
   
@@ -45,6 +55,9 @@ if(file.exists('output/annotations/coverage/coverage_table.txt') == TRUE) {
   
   # adds new row
   coverage_table <- rbind(coverage_table, new_row)
+  
+  # sort alphabetically by sample name
+  coverage_table <- coverage_table[order(coverage_table$sample_name), ]
   
   # write  to coverage_table.txt
   write.table(coverage_table, file = 'output/annotations/coverage/coverage_table.txt',
@@ -62,7 +75,7 @@ if(file.exists('output/annotations/coverage/coverage_table.txt') == TRUE) {
   write.table(coverage_table, file = 'output/annotations/coverage/coverage_table.txt', 
               col.names = FALSE, row.names = FALSE)
 }
-#read.table('output/annotations/coverage/coverage_table.txt', header = TRUE)
-
+coverage_table <- read.table('output/annotations/coverage/coverage_table.txt', header = TRUE)
+coverage_table <- coverage_table[order(coverage_table$sample_name), ]
 
 

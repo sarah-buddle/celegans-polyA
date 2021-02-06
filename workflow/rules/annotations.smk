@@ -37,9 +37,11 @@ output/annotations/granges/trinity/bristol/as/rep2/trinity_bristol_as_rep2.RData
 rule coverage_liftover:
     input:
         script='scripts/annotations/coverage.R',
-        granges='output/annotations/granges/liftover/{location}/liftover_{location}.RData'
+        granges='output/annotations/granges/{annotation_type}/{location}/{annotation_type}_{location}.RData'
     output:
-        coverage='output/annotations/coverage/liftover/{location}/liftover_{location}.RData'
+        coverage='output/annotations/coverage/{annotation_type}/{location}/{annotation_type}_{location}.RData'
+        #Also adds line to:
+        #coverage_table='output/annotations/coverage/coverage_table.csv'
     conda:
         '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
     script:
@@ -55,7 +57,8 @@ rule coverage_maker:
         script='scripts/annotations/coverage.R',
         granges='output/annotations/granges/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
     output:
-        coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData',
+        coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
+        #Also adds line to:
         #coverage_table='output/annotations/coverage/coverage_table.csv'
     conda:
         '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
