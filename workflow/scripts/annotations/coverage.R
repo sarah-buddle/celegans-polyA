@@ -75,7 +75,8 @@ if(file.exists('output/annotations/coverage/coverage_table.txt') == TRUE) {
   write.table(coverage_table, file = 'output/annotations/coverage/coverage_table.txt', 
               col.names = FALSE, row.names = FALSE)
 }
-coverage_table <- read.table('output/annotations/coverage/coverage_table.txt', header = TRUE)
-coverage_table <- coverage_table[order(coverage_table$sample_name), ]
+
+# coverage_table <- read.table('output/annotations/coverage/coverage_table.txt', header = TRUE)
+
 
 
