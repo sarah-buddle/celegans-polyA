@@ -7,6 +7,8 @@ setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
 library(rtracklayer)
 
 # Import annotation
+# annotation <- rtracklayer::import('from_cluster/maker_annotations/trinity/bristol/as/rep2/trinity_bristol_as_rep2.gff')
+# annotation <- rtracklayer::import('from_cluster/liftover_annotations/bristol/liftover_bristol.gtf')
 annotation <- rtracklayer::import(snakemake@input$annotation)
 
 # Remove rows corresponding to contigs
