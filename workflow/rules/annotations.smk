@@ -1,3 +1,7 @@
+LOCATIONS = ['bristol']
+DIETS = ['as','bp','hb101','m9','op50','pf']
+REPLICATES = ['rep1','rep2','rep3']
+
 rule granges_liftover:
     input:
         script='scripts/annotations/granges.R',
@@ -51,7 +55,8 @@ rule coverage_maker:
         script='scripts/annotations/coverage.R',
         granges='output/annotations/granges/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
     output:
-        coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
+        coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData',
+        #coverage_table='output/annotations/coverage/coverage_table.csv'
     conda:
         '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
     script:
