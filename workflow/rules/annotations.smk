@@ -30,6 +30,38 @@ snakemake --cores 1 --use-conda \
 output/annotations/granges/trinity/bristol/as/rep2/trinity_bristol_as_rep2.RData
 '''
 
+rule coverage_liftover:
+    input:
+        script='scripts/annotations/coverage.R',
+        granges='output/annotations/granges/liftover/{location}/liftover_{location}.RData'
+    output:
+        coverage='output/annotations/coverage/liftover/{location}/liftover_{location}.RData'
+    conda:
+        '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
+    script:
+        '../scripts/annotations/coverage.R'
+
+'''
+snakemake --cores 1 --use-conda \
+output/annotations/coverage/liftover/bristol/liftover_bristol.RData
+'''
+
+rule coverage_maker:
+    input:
+        script='scripts/annotations/coverage.R',
+        granges='output/annotations/granges/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
+    output:
+        coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
+    conda:
+        '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
+    script:
+        '../scripts/annotations/coverage.R'
+
+'''
+snakemake --cores 1 --use-conda \
+output/annotations/coverage/trinity/bristol/as/rep2/trinity_bristol_as_rep2.RData
+'''
+
 rule find_overlaps_maker:
     input:
         script='scripts/annotations/find_overlaps.R',
