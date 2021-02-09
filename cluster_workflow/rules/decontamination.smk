@@ -44,10 +44,25 @@ snakemake --cluster-config ../snakemake_profile/slurm.json --use-conda \
 output/polyA/decontamination/unmapped_sorted_fastq/bristol/as/rep1/bristol_as_rep1.fastq
 '''
 
+rule remove_unpaired_reads:
+    input:
+        'output/polyA/decontamination/unmapped_sorted_fastq/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+    output:
+        'output/polyA/decontamination/unmapped_sorted_fastq_paired/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+    conda:
+        '../envs/conda/bbtools=37.62.yaml'
+    shell:
+        'repair.sh in={input} out={output}'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/decontamination/unmapped_sorted_fastq_paired/bristol/as/rep1/bristol_as_rep1.fastq
+'''
+
 rule velveth:
     ''' De novo assembly of unmapped reads '''
     input:
-        'output/polyA/decontamination/unmapped_sorted_fastq/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+        'output/polyA/decontamination/unmapped_sorted_fastq_paired/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
     output:
         'output/polyA/decontamination/velvet/{location}/{diet}/{replicate}/Roadmaps',
         'output/polyA/decontamination/velvet/{location}/{diet}/{replicate}/Sequences',
@@ -86,20 +101,19 @@ snakemake --cluster-config ../snakemake_profile/slurm.json --use-conda \
 output/polyA/decontamination/velvet/bristol/as/rep1/contigs.fa
 '''
 
+# mkdir and move part not working
 rule index_velvet:
     ''' Index velvet output ready for hisat2 '''
     input:
         'output/polyA/decontamination/velvet/{location}/{diet}/{replicate}/contigs.fa'
     output:
-        expand('output/polyA/decontamination/velvet/{{location}}/{{diet}}/{{replicate}}/indexes/indexes.{index}.ht2', \
+        expand('output/polyA/decontamination/velvet/{{location}}/{{diet}}/{{replicate}}/indexes.{index}.ht2', \
         index=INDEXES),
     conda:
         '../envs/conda/hisat2=2.2.1.yaml'
     shell:
         'hisat2-build {input} output/polyA/decontamination/velvet/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/indexes;'
-        'cd output/polyA/decontamination/velvet/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/;'
-        'mkdir indexes;'
-        'mv indexes.*.ht2 indexes'
+        'cd output/polyA/decontamination/velvet/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/'
 
 '''
 snakemake --cluster-config ../snakemake_profile/slurm.json --use-conda \
@@ -110,7 +124,7 @@ output/polyA/decontamination/velvet/bristol/as/rep1/indexes
 rule hisat2_velvet:
     ''' Align reads to the genome '''
     input:
-        indexes=expand('output/polyA/decontamination/velvet/{{location}}/{{diet}}/{{replicate}}/indexes/indexes.{index}.ht2', \
+        indexes=expand('output/polyA/decontamination/velvet/{{location}}/{{diet}}/{{replicate}}/indexes.{index}.ht2', \
         index=INDEXES),
         trimmed1='output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1_trimmed.fastq',
         trimmed2='output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads2/{location}_{diet}_{replicate}_2_trimmed.fastq'
@@ -120,7 +134,7 @@ rule hisat2_velvet:
         '../envs/conda/hisat2=2.2.1.yaml'
     threads: 8
     shell:
-        'hisat2 --dta -x output/polyA/decontamination/velvet/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/indexes/indexes \
+        'hisat2 --dta -x output/polyA/decontamination/velvet/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/indexes \
         -1 {input.trimmed1} -2 {input.trimmed2} -S {output}'
 
 '''
@@ -177,10 +191,25 @@ rule unmapped_sort_fastq_2:
     shell:
         'fastq-sort {input} > {output}'
 
+rule remove_unpaired_reads_2:
+    input:
+        'output/polyA/decontamination/unmapped_sorted_fastq_2/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+    output:
+        'output/polyA/decontamination/unmapped_sorted_fastq_paired_2/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+    conda:
+        '../envs/conda/bbtools=37.62.yaml'
+    shell:
+        'repair.sh in={input} out={output}'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/decontamination/unmapped_sorted_fastq_paired/bristol/as/rep1/bristol_as_rep1.fastq
+'''
+
 rule deinterleave_decontamination:
     ''' Separate paired end reads '''
     input:
-        'output/polyA/decontamination/unmapped_sorted_fastq_2/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
+        'output/polyA/decontamination/unmapped_sorted_fastq_paired_2/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.fastq'
     output:
         reads1 = 'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1.fastq',
         reads2 = 'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads2/{location}_{diet}_{replicate}_2.fastq'
@@ -193,4 +222,26 @@ rule deinterleave_decontamination:
 snakemake --profile ../snakemake_profile \
 output/polyA/decontamination/deinterleaved_fastq/bristol/as/rep1/reads1/bristol_as_rep1_1.fastq \
 output/polyA/decontamination/deinterleaved_fastq/bristol/as/rep1/reads2/bristol_as_rep1_2.fastq
+'''
+
+rule trinity_decontamination:
+    input:
+        reads1 = 'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1.fastq',
+        reads2 = 'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads2/{location}_{diet}_{replicate}_2.fastq'
+    output:
+        'output/polyA/decontamination/trinity/{location}/{diet}/{replicate}/trinity/Trinity.fasta'
+    conda:
+        '../envs/conda/Trinity=2.11.0.yaml'
+    threads: 8
+    shell:
+        'Trinity --seqType fq --max_memory 60G  --CPU {threads} \
+        --left {input.reads1} --right {input.reads2} \
+        --output output/polyA/reference_free/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/decontamination/trinity/bristol/as/rep1/trinity/Trinity.fasta
+
+snakemake --cores 1 --use-conda \
+output/polyA/decontamination/trinity/bristol/as/rep1/trinity/Trinity.fasta
 '''
