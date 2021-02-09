@@ -79,7 +79,7 @@ rule coverage_maker:
     output:
         coverage='output/annotations/coverage/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
         #Also adds line to:
-        #coverage_table='output/annotations/coverage/coverage_table.csv'
+        #coverage_table='output/annotations/coverage/coverage_table.txt'
     conda:
         '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
     script:
@@ -93,6 +93,21 @@ output/annotations/coverage/soap/bristol/hb101/rep1_2_3/soap_bristol_hb101_rep1_
 output/annotations/coverage/soap/bristol/m9/rep1_2_3/soap_bristol_m9_rep1_2_3.RData \
 output/annotations/coverage/soap/bristol/op50/rep1_2_3/soap_bristol_op50_rep1_2_3.RData \
 output/annotations/coverage/soap/bristol/pf/rep1_2_3/soap_bristol_pf_rep1_2_3.RData
+'''
+
+rule plot_coverage:
+    input:
+        script='scripts/annotations/plot_coverage.R',
+        coverage_table='output/annotations/coverage/coverage_table.txt'
+    output:
+        coverage_plot='output/annotations/coverage/plots/coverage_plot.png'
+    conda:
+        '../envs/conda/r-ggplot2=3.3.1.yaml'
+    script:
+        '../scripts/annotations/plot_coverage.R'
+
+'''
+snakemake --cores 1 --use-conda output/annotations/coverage/plots/coverage_plot.png
 '''
 
 rule find_overlaps_maker:
