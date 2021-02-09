@@ -14,5 +14,9 @@ annotation <- rtracklayer::import(snakemake@input$annotation)
 # Remove rows corresponding to contigs
 annotation <- annotation[which(annotation$type != 'contig'), ]
 
+# Just include genes
+annotation_genes <- annotation[which(annotation$type == 'gene'), ]
+
 # Save output
 save(annotation, file = snakemake@output$granges)
+save(annotation, file = snakemake@output$granges_genes)
