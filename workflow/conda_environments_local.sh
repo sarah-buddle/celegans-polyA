@@ -50,3 +50,9 @@ conda create --name bioconductor-genomicranges=1.42.0 --channel conda-forge --ch
 conda create bioconductor-genomicranges=1.42.0
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-genomicranges=1.42.0.yaml
 conda deactivate
+
+# ggplot2
+conda create --name r-ggplot2=3.3.1 --channel conda-forge --channel bioconda --yes r-ggplot2=3.3.1
+conda activate r-ggplot2=3.3.1
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-ggplot2=3.3.1.yaml
+conda deactivate
