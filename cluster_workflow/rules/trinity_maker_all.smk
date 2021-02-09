@@ -43,6 +43,12 @@ rule maker:
         'maker -cpus {threads} -q;'
         'gff3_merge -d {wildcards.location}_genome.fasta.maker.output/{wildcards.location}_genome.fasta_master_datastore_index.log'
 
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker/bristol/m9/rep2/bristol_genome.fasta.all.gff
+'''
+
+
 rule maker_rep2:
     input:
         premade='polyA/reference_free/maker/{location}/{diet}/rep1/{location}_genome.fasta.all.gff',

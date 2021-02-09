@@ -107,15 +107,14 @@ conda activate rseqc=4.0.0
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/rseqc=4.0.0.yaml
 conda deactivate
 
-# local machine (run from workflow folder)
-# also samtools as above
-
-# deseq2
-conda create --name bioconductor-deseq2=1.30.0 --channel conda-forge --channel bioconda --yes bioconductor-deseq2=1.30.0
-conda activate bioconductor-deseq2=1.30.0
-conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-deseq2=1.30.0.yaml
+# velvet
+conda create --name velvet=1.2.10 --channel conda-forge --channel bioconda --yes velvet=1.2.10
+conda activate velvet=1.2.10
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/velvet=1.2.10.yaml
 conda deactivate
 
-# gff3 sort
-conda create --name gff3sort=0.1.a1a2bc9 --channel conda-forge --channel bioconda --yes gff3sort=0.1.a1a2bc9
-conda activate gff3sort=0.1.a1a2bc9
+# bbtools
+conda create --name bbtools=37.62 --channel agbiome --yes bbtools=37.62
+conda activate bbtools=37.62
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bbtools=37.62.yaml
+conda deactivate
