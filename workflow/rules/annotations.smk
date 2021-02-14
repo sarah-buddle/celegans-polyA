@@ -9,7 +9,7 @@ from_cluster/maker_annotations/soap
 
 rule rename_maker:
     input:
-        'from_cluster/maker_annotations/soap/maker_soap_export/{location}/{diet}/{replicate}/{location}_genome.fasta.all.gff'
+        'from_cluster/maker_annotations/soap/{location}/{diet}/{replicate}/{location}_genome.fasta.all.gff'
     output:
         'from_cluster/maker_annotations/soap/{location}/{diet}/{replicate}/soap_{location}_{diet}_{replicate}.gff'
     shell:
@@ -19,6 +19,20 @@ rule rename_maker:
 snakemake --cores 1 --use-conda \
 from_cluster/maker_annotations/soap/bristol/as/rep1_2_3/soap_bristol_as_rep1_2_3.gff
 '''
+
+rule rename_rep1_2_3:
+    input:
+        'from_cluster/maker_annotations/soap/{location}/{diet}/rep1_2_3/soap_{location}_{diet}_rep1_2_3.gff'
+    output:
+        'from_cluster/maker_annotations/soap/{location}/{diet}/rep123/soap_{location}_{diet}_rep123.gff'
+    shell:
+        'mv {input} {output}'
+
+'''
+snakemake --cores 1 \
+from_cluster/maker_annotations/soap/bristol/as/rep123/soap_bristol_as_rep123.gff
+'''
+
 
 rule granges_liftover:
     input:
@@ -51,7 +65,24 @@ rule granges_maker:
 
 '''
 snakemake --cores 1 --use-conda \
-output/annotations/granges/trinity/bristol/as/rep2/trinity_bristol_as_rep2.RData
+output/annotations/granges/soap/bristol/as/rep123/soap_bristol_as_rep123.RData
+'''
+
+rule granges_stringtie:
+    input:
+        script='scripts/annotations/granges.R',
+        annotation='from_cluster/maker_annotations/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.gtf'
+    output:
+        granges='output/annotations/granges/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData',
+        granges_genes='output/annotations/granges_genes/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
+    conda:
+        '../envs/conda/bioconductor-rtracklayer=1.50.0.yaml'
+    script:
+        '../scripts/annotations/granges.R'
+
+'''
+snakemake --cores 1 --use-conda \
+output/annotations/granges/stringtie/bristol/as/rep2/stringtie_bristol_as_rep2.RData
 '''
 
 rule coverage_liftover:
@@ -69,10 +100,10 @@ rule coverage_liftover:
 
 '''
 snakemake --cores 1 --use-conda \
-output/annotations/coverage/liftover/bristol/liftover_bristol.RData
+output/annotations/coverage/liftover/altadena/liftover_altadena.RData
 '''
 
-rule coverage_maker:
+rule coverage_new_annotations:
     input:
         script='scripts/annotations/coverage.R',
         granges='output/annotations/granges/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.RData'
@@ -87,27 +118,26 @@ rule coverage_maker:
 
 '''
 snakemake --cores 1 --use-conda \
-output/annotations/coverage/soap/bristol/as/rep1_2_3/soap_bristol_as_rep1_2_3.RData \
-output/annotations/coverage/soap/bristol/bp/rep1_2_3/soap_bristol_bp_rep1_2_3.RData \
-output/annotations/coverage/soap/bristol/hb101/rep1_2_3/soap_bristol_hb101_rep1_2_3.RData \
-output/annotations/coverage/soap/bristol/m9/rep1_2_3/soap_bristol_m9_rep1_2_3.RData \
-output/annotations/coverage/soap/bristol/op50/rep1_2_3/soap_bristol_op50_rep1_2_3.RData \
-output/annotations/coverage/soap/bristol/pf/rep1_2_3/soap_bristol_pf_rep1_2_3.RData
+output/annotations/coverage/stringtie/bristol/m9/rep2/stringtie_bristol_m9_rep2.RData \
+output/annotations/coverage/stringtie/bristol/m9/rep3/stringtie_bristol_m9_rep3.RData \
+output/annotations/coverage/stringtie/bristol/m9/rep2/stringtie_bristol_as_rep2.RData \
+output/annotations/coverage/stringtie/bristol/m9/rep3/stringtie_bristol_as_rep3.RData \
+output/annotations/coverage/stringtie/bristol/as/rep123/stringtie_bristol_as_rep123.RData
 '''
 
-rule plot_coverage:
+rule plot_coverage_comparison:
     input:
-        script='scripts/annotations/plot_coverage.R',
+        script='scripts/annotations/plot_coverage_comparison.R',
         coverage_table='output/annotations/coverage/coverage_table.txt'
     output:
-        coverage_plot='output/annotations/coverage/plots/coverage_plot.png'
+        coverage_plot='output/annotations/coverage/plots/coverage_plot_comparison.tiff'
     conda:
         '../envs/conda/r-ggplot2=3.3.1.yaml'
     script:
-        '../scripts/annotations/plot_coverage.R'
+        '../scripts/annotations/plot_coverage_comparison.R'
 
 '''
-snakemake --cores 1 --use-conda output/annotations/coverage/plots/coverage_plot.png
+snakemake --cores 1 --use-conda output/annotations/coverage/plots/coverage_plot_comparison.tiff
 '''
 
 rule find_overlaps_maker:
@@ -135,7 +165,8 @@ rule find_overlaps_liftover_maker:
         granges1='output/annotations/granges/liftover/{location1}/liftover_{location1}.RData',
         granges2='output/annotations/granges/{annotation_type2}/{location2}/{diet2}/{replicate2}/{annotation_type2}_{location2}_{diet2}_{replicate2}.RData'
     output:
-        overlaps='output/annotations/overlaps/liftover_{location1}_vs_{annotation_type2}_{location2}_{diet2}_{replicate2}.RData'
+        overlaps='output/annotations/overlaps/liftover_{location1}_vs_{annotation_type2}_{location2}_{diet2}_{replicate2}.RData',
+        overlap_counts='output/annotations/overlap_counts/liftover_{location1}_vs_{annotation_type2}_{location2}_{diet2}_{replicate2}.RData'
     conda:
         '../envs/conda/bioconductor-genomicranges=1.42.0.yaml'
     script:
@@ -143,7 +174,9 @@ rule find_overlaps_liftover_maker:
 
 '''
 snakemake --cores 1 --use-conda \
-output/annotations/overlaps/liftover_bristol_vs_soap_bristol_as_rep2.RData
+output/annotations/overlaps/liftover_altadena_vs_soap_altadena_as_rep123.RData \
+snakemake --cores 1 --use-conda \
+output/annotations/overlaps/liftover_bristol_vs_soap_bristol_as_rep123.RData
 '''
 
 rule find_overlaps_liftover:
