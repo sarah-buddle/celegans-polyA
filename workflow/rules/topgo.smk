@@ -64,6 +64,7 @@ rule topgo_gentable:
         '../scripts/topgo_gentable.R'
 
 '''
-snakemake --cores 1 --use-conda output/topgo_gentable/classicFisher/bristol/bristol_pf_op50.RData
-snakemake --cores 1 --use-conda output/topgo_gentable/classicFisher/altadena/altadena_pf_op50.RData
+snakemake --cores 1 --use-conda \
+output/topgo_gentable/classicFisher/bristol/bristol_m9_op50.RData \
+output/topgo_gentable/classicFisher/altadena/altadena_m9_op50.RData
 '''
