@@ -56,3 +56,7 @@ conda create --name r-ggplot2=3.3.1 --channel conda-forge --channel bioconda --y
 conda activate r-ggplot2=3.3.1
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-ggplot2=3.3.1.yaml
 conda deactivate
+
+# fqtools
+conda create --name fqtools=2.0 --channel conda-forge --channel bioconda --yes fqtools=2.0
+conda activate fqtools=2.0
