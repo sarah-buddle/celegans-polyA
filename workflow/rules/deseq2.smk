@@ -2,10 +2,6 @@ LOCATIONS = ['bristol','altadena']
 DIETS = ['as','bp','hb101','m9','op50','pf']
 REPLICATES = ['rep1','rep2','rep3']
 
-# rule all:
-#     input:
-#         'output/deseq2/{location}_percentage_plot.png'
-
 rule deseq2:
     ''' Creates DESeq2 objects for use in further analysis '''
     input:
@@ -21,24 +17,20 @@ rule deseq2:
     script:
         '../scripts/deseq2.R'
 
-'''
-snakemake --cores 1 --use-conda output/deseq2_data/bristol/bristol_full_dds.RData
-'''
-
 rule deseq2_PCA:
     ''' PCA Plot to summarise differential expression analysis '''
     input:
         script='scripts/deseq2_pca.R',
         rlog_dds='output/deseq2_data/{location}/{location}_rlog_dds.RData'
     output:
-        pca_plot='output/deseq2_plots/{location}/{location}_deseq2_pca.png'
+        pca_plot='output/deseq2_plots/{location}/{location}_deseq2_pca.tiff'
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0_r-ggplot2=3.3.1.yaml'
     script:
         '../scripts/deseq2_pca.R'
 
 '''
-snakemake --cores 1 --use-conda output/deseq2_plots/bristol/bristol_deseq2_pca.png
+snakemake --cores 1 --use-conda output/deseq2_plots/altadena/altadena_deseq2_pca.tiff
 '''
 
 rule deseq2_no_m9:
@@ -90,6 +82,7 @@ snakemake --cores 1 --use-conda output/deseq2/bristol_deseq2_pca_no_m9.png
 # snakemake --cores 1 --use-conda output/gene_counts/bristol_gene_count.RData
 # '''
 
+
 rule deseq2_percentage_genes_expressed:
     input:
         script='scripts/deseq2_percentage_genes_expressed.R',
@@ -107,12 +100,46 @@ snakemake --cores 1 --use-conda \
 output/deseq2_plots/altadena/altadena_percentage_plot.png
 '''
 
+rule count_percentage_genes_expressed:
+    input:
+        script='scripts/count_percentage_genes_expressed.R',
+        full_dds='output/deseq2_data/{location}/{location}_full_dds.RData',
+        samples='scripts/htseqcount_samples_full.csv'
+    output:
+        expressed_genes='output/expressed_genes/{location}/{location}_expressed_genes.RData'
+    conda:
+        '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
+    script:
+        '../scripts/count_percentage_genes_expressed.R'
+
+'''
+snakemake --cores 1 --use-conda \
+output/expressed_genes/bristol/bristol_expressed_genes.RData
+'''
+
+rule plot_percentage_expression_all:
+    input:
+        script='scripts/plot_percentage_expression_all.R',
+        full_dds_altadena='output/expressed_genes/altadena/altadena_expressed_genes.RData',
+        full_dds_bristol='output/expressed_genes/bristol/bristol_expressed_genes.RData'
+    output:
+        percentage_plot='output/deseq2_plots/all/percentage_plot_all.tiff'
+    conda:
+        '../envs/conda/bioconductor-deseq2=1.30.0_r-ggplot2=3.3.1.yaml'
+    script:
+        '../scripts/plot_percentage_expression_all.R'
+
+'''
+snakemake --cores 1 --use-conda \
+output/deseq2_plots/all/percentage_plot_all.tiff
+'''
+
 rule de_analysis:
     input:
         script='scripts/de_analysis.R',
         full_dds='output/deseq2_data/{location}/{location}_full_dds.RData'
     output:
-        dds_res='output/deseq2_data/{location}/{location}_{diet1}_{diet2}.RData'
+        dds_res='output/deseq2_results/{location}/{location}_{diet1}_{diet2}.RData'
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
     script:
