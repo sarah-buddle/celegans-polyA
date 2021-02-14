@@ -5,8 +5,8 @@ REPLICATES = ['rep1','rep2','rep3']
 rule deseq2:
     ''' Creates DESeq2 objects for use in further analysis '''
     input:
-        script='scripts/deseq2.R',
-        samples='scripts/htseqcount_samples_full.csv',
+        script='scripts/deseq2/deseq2.R',
+        samples='scripts/deseq2/htseqcount_samples_full.csv',
         htseq_count=expand('from_cluster/htseq_count_export/{{location}}_{diet}_{replicate}_counts.txt', \
         diet=DIETS, replicate=REPLICATES)
     output:
@@ -15,19 +15,19 @@ rule deseq2:
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
     script:
-        '../scripts/deseq2.R'
+        '../scripts/deseq2/deseq2.R'
 
 rule deseq2_PCA:
     ''' PCA Plot to summarise differential expression analysis '''
     input:
-        script='scripts/deseq2_pca.R',
+        script='scripts/deseq2/deseq2_pca.R',
         rlog_dds='output/deseq2_data/{location}/{location}_rlog_dds.RData'
     output:
         pca_plot='output/deseq2_plots/{location}/{location}_deseq2_pca.tiff'
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0_r-ggplot2=3.3.1.yaml'
     script:
-        '../scripts/deseq2_pca.R'
+        '../scripts/deseq2/deseq2_pca.R'
 
 '''
 snakemake --cores 1 --use-conda output/deseq2_plots/altadena/altadena_deseq2_pca.tiff
@@ -36,7 +36,7 @@ snakemake --cores 1 --use-conda output/deseq2_plots/altadena/altadena_deseq2_pca
 rule deseq2_no_m9:
     ''' Creates DESeq2 object without m9/starvation diet treatment '''
     input:
-        script='scripts/deseq2.R',
+        script='scripts/deseq2/deseq2_no_m9.R',
         samples='scripts/htseqcount_samples_full.csv',
         htseq_count=expand('from_cluster/htseq_count_export/{{location}}_{diet}_{replicate}_counts.txt', \
         diet=DIETS, replicate=REPLICATES)
@@ -45,7 +45,7 @@ rule deseq2_no_m9:
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
     script:
-        '../scripts/deseq2_no_m9.R'
+        '../scripts/deseq2/deseq2_no_m9.R'
 
 '''
 snakemake --cores 1 --use-conda output/deseq2/bristol_no_m9_rlog_dds.RData
@@ -84,8 +84,9 @@ snakemake --cores 1 --use-conda output/deseq2/bristol_deseq2_pca_no_m9.png
 
 
 rule deseq2_percentage_genes_expressed:
+    ''' Plot percentage genes expressed for single location '''
     input:
-        script='scripts/deseq2_percentage_genes_expressed.R',
+        script='scripts/deseq2/plot_percentage_genes_expressed.R',
         full_dds='output/deseq2_data/{location}/{location}_full_dds.RData',
         samples='scripts/htseqcount_samples_full.csv'
     output:
@@ -93,7 +94,7 @@ rule deseq2_percentage_genes_expressed:
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0_r-ggplot2=3.3.1.yaml'
     script:
-        '../scripts/deseq2_percentage_genes_expressed.R'
+        '../scripts/deseq2/plot_percentage_genes_expressed.R'
 
 '''
 snakemake --cores 1 --use-conda \
@@ -101,8 +102,9 @@ output/deseq2_plots/altadena/altadena_percentage_plot.png
 '''
 
 rule count_percentage_genes_expressed:
+    ''' Count percentage of total genes expressed '''
     input:
-        script='scripts/count_percentage_genes_expressed.R',
+        script='scripts/deseq2/count_percentage_genes_expressed.R',
         full_dds='output/deseq2_data/{location}/{location}_full_dds.RData',
         samples='scripts/htseqcount_samples_full.csv'
     output:
@@ -110,7 +112,7 @@ rule count_percentage_genes_expressed:
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
     script:
-        '../scripts/count_percentage_genes_expressed.R'
+        '../scripts/deseq2/count_percentage_genes_expressed.R'
 
 '''
 snakemake --cores 1 --use-conda \
@@ -136,14 +138,14 @@ output/deseq2_plots/all/percentage_plot_all.tiff
 
 rule de_analysis:
     input:
-        script='scripts/de_analysis.R',
+        script='scripts/deseq2/de_analysis.R',
         full_dds='output/deseq2_data/{location}/{location}_full_dds.RData'
     output:
         dds_res='output/deseq2_results/{location}/{location}_{diet1}_{diet2}.RData'
     conda:
         '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
     script:
-        '../scripts/de_analysis.R'
+        '../scripts/deseq2/de_analysis.R'
 
 '''
 snakemake --cores 1 --use-conda output/deseq2_data/bristol/bristol_as_op50.RData
