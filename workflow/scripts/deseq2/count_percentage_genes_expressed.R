@@ -7,9 +7,11 @@ setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
 library(DESeq2)
 
 # Import sample list
+samples <- as.data.frame(read.csv('scripts/deseq2/htseqcount_samples_full.csv'))
 samples <- as.data.frame(read.csv(snakemake@input$samples))
 
 # Set location
+# samples <-  subset(samples, location == 'altadena')
 samples <- subset(samples, location == snakemake@wildcards$location)
 
 # Load appropriate DESeq object made by deseq script
