@@ -224,6 +224,27 @@ output/polyA/decontamination/deinterleaved_fastq/bristol/as/rep1/reads1/bristol_
 output/polyA/decontamination/deinterleaved_fastq/bristol/as/rep1/reads2/bristol_as_rep1_2.fastq
 '''
 
+rule fastqc_decontamination:
+    ''' Perform fastqc to check quality of untrimmed reads '''
+    input:
+        'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}.fastq'
+    output:
+        html='output/polyA/decontamination/fastqc/reports/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_fastqc.html',
+        zip='output/polyA/decontamination/fastqc/zip/{location}/{diet}/{replicate}/reads{reads}/{location}_{diet}_{replicate}_{reads}_fastqc.zip'
+    conda:
+        '../envs/conda/fastqc=0.11.9.yaml'
+    shell:
+        'mkdir output/polyA/QC/fastqc/tempdir;'
+        'fastqc {input} --outdir output/polyA/QC/fastqc/tempdir;'
+        'mv output/polyA/decontamination/fastqc/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_fastqc.html {output.html};'
+        'mv output/polyA/decontamination/fastqc/tempdir/{wildcards.location}_{wildcards.diet}_{wildcards.replicate}_{wildcards.reads}_fastqc.zip {output.zip}'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/decontamination/fastqc/reports/bristol/as/rep1/reads1/bristol_as_rep1_1_fastqc.html \
+output/polyA/decontamination/fastqc/reports/bristol/as/rep1/reads2/bristol_as_rep1_2_fastqc.html
+'''
+
 rule trinity_decontamination:
     input:
         reads1 = 'output/polyA/decontamination/deinterleaved_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1.fastq',
