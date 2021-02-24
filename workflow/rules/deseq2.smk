@@ -150,3 +150,55 @@ rule de_analysis:
 '''
 snakemake --cores 1 --use-conda output/deseq2_data/bristol/bristol_as_op50.RData
 '''
+
+rule deseq2_all_count_matrix:
+    input:
+        script='scripts/deseq2/deseq2_all_count_matrix.R',
+        htseq_count=expand('from_cluster/htseq_count_export/{location}_{diet}_{replicate}_counts.txt', \
+        location = LOCATIONS, diet=DIETS, replicate=REPLICATES)
+    output:
+        count_matrix='output/deseq2_data/all/count_matrix.rds'
+    conda:
+        '../envs/conda/r-tidyverse=1.2.1.yaml'
+    script:
+        '../scripts/deseq2/deseq2_all_count_matrix.R'
+
+'''
+snakemake --cores 1 --use-conda -R \
+output/deseq2_data/all/count_matrix.rds
+'''
+
+rule deseq2_all:
+    input:
+        script='scripts/deseq2/deseq2_all.R',
+        samples='scripts/deseq2/htseqcount_samples_full.csv',
+        count_matrix='output/deseq2_data/all/count_matrix.rds'
+    output:
+        vst_dds='output/deseq2_data/all/all_vst_dds.rds',
+        full_dds='output/deseq2_data/all/all_full_dds.rds'
+    conda:
+        '../envs/conda/bioconductor-deseq2=1.30.0.yaml'
+    script:
+        '../scripts/deseq2/deseq2_all.R'
+
+'''
+snakemake --cores 1 --use-conda -R \
+output/deseq2_data/all/all_vst_dds.rds
+'''
+
+rule deseq2_pca_all:
+    ''' PCA Plot to summarise differential expression analysis '''
+    input:
+        script='scripts/deseq2/all_deseq2_pca.R',
+        vst_dds='output/deseq2_data/all/all_vst_dds.rds'
+    output:
+        pca_plot='output/deseq2_plots/all/all_deseq2_pca.tiff'
+    conda:
+        '../envs/conda/bioconductor-deseq2=1.30.0_r-ggplot2=3.3.1.yaml'
+    script:
+        '../scripts/deseq2/all_deseq2_pca.R'
+
+'''
+snakemake --cores 1 --use-conda -R \
+output/deseq2_plots/all/all_deseq2_pca.tiff
+'''
