@@ -93,6 +93,42 @@ rule index_bam:
     shell:
         'samtools index {input}'
 
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/genome_guided/sorted_bam/bristol/as/rep1/bristol_as_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/as/rep2/bristol_as_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/as/rep3/bristol_as_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/bp/rep1/bristol_bp_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/bp/rep2/bristol_bp_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/bp/rep3/bristol_bp_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/hb101/rep1/bristol_hb101_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/hb101/rep2/bristol_hb101_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/hb101/rep3/bristol_hb101_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/m9/rep1/bristol_m9_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/op50/rep1/bristol_op50_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/op50/rep2/bristol_op50_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/op50/rep3/bristol_op50_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/pf/rep1/bristol_pf_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/pf/rep2/bristol_pf_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/bristol/pf/rep3/bristol_pf_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/as/rep1/altadena_as_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/as/rep2/altadena_as_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/as/rep3/altadena_as_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/bp/rep1/altadena_bp_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/bp/rep2/altadena_bp_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/bp/rep3/altadena_bp_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/hb101/rep1/altadena_hb101_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/hb101/rep2/altadena_hb101_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/hb101/rep3/altadena_hb101_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/m9/rep1/altadena_m9_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/op50/rep1/altadena_op50_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/op50/rep2/altadena_op50_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/op50/rep3/altadena_op50_rep3.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/pf/rep1/altadena_pf_rep1.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/pf/rep2/altadena_pf_rep2.bam.bai \
+output/polyA/genome_guided/sorted_bam/altadena/pf/rep3/altadena_pf_rep3.bam.bai
+'''
+
 rule htseq_count:
     ''' counts reads mapping to each gene in reference annotation '''
     input:
@@ -190,9 +226,41 @@ output/polyA/genome_guided/stringtie/altadena/hb101/rep123/altadena_hb101_rep123
 output/polyA/genome_guided/stringtie/altadena/m9/rep123/altadena_m9_rep123.gtf \
 output/polyA/genome_guided/stringtie/altadena/op50/rep123/altadena_op50_rep123.gtf \
 output/polyA/genome_guided/stringtie/altadena/pf/rep123/altadena_pf_rep123.gtf
-
 '''
 
+rule merge_stringtie_all:
+    input:
+        expand('output/polyA/genome_guided/stringtie/{{location}}/{diet}/rep123/{{location}}_{diet}_rep123.gtf',
+        diet = DIETS)
+    output:
+        'output/polyA/genome_guided/stringtie/{location}/all/rep123/stringtie_{location}_all_rep123.gtf'
+    conda:
+        '../envs/conda/stringtie=2.1.4.yaml'
+    shell:
+        'stringtie --merge {input} -o {output}'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/genome_guided/stringtie/altadena/all/rep123/altadena_all_rep123.gtf
+'''
+
+rule stringtie_export:
+    input:
+        'output/polyA/genome_guided/stringtie/{location}/{diet}/rep123/{location}_{diet}_rep123.gtf'
+    output:
+        'output/polyA/genome_guided/stringtie_export/{location}/{diet}/rep123/stringtie_{location}_{diet}_rep123.gtf'
+    shell:
+        'cp {input} {output}'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/genome_guided/stringtie_export/altadena/as/rep123/stringtie_altadena_as_rep123.gtf \
+output/polyA/genome_guided/stringtie_export/altadena/bp/rep123/stringtie_altadena_bp_rep123.gtf \
+output/polyA/genome_guided/stringtie_export/altadena/hb101/rep123/stringtie_altadena_hb101_rep123.gtf \
+output/polyA/genome_guided/stringtie_export/altadena/m9/rep123/stringtie_altadena_m9_rep123.gtf \
+output/polyA/genome_guided/stringtie_export/altadena/op50/rep123/stringtie_altadena_op50_rep123.gtf \
+output/polyA/genome_guided/stringtie_export/altadena/pf/rep123/stringtie_altadena_pf_rep123.gtf
+'''
 
 '''
 # export to local machine for analysis in R
@@ -201,6 +269,7 @@ sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided
 sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/m9/rep2/bristol_m9_rep2.gtf \
 sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/m9/rep3/bristol_m9_rep3.gtf .
 
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/as/rep123/bristol_as_rep123.gtf .
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/all/rep123/stringtie_bristol_all_rep123.gtf \
+sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/altadena/all/rep123/stringtie_altadena_all_rep123.gtf .
 
 '''
