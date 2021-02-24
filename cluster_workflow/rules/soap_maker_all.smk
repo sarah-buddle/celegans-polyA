@@ -182,6 +182,39 @@ output/polyA/reference_free/maker_soap_export/altadena/op50/rep1_2_3/altadena_ge
 output/polyA/reference_free/maker_soap_export/altadena/pf/rep1_2_3/altadena_genome.fasta.all.gff
 '''
 
+rule merge_maker_all_stringtie:
+    input:
+        expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
+        diet = DIETS)
+    output:
+        'output/polyA/reference_free/maker_soap_export/{location}/all/rep123/soap_{location}_all_rep123.gtf'
+    conda:
+        '../envs/conda/stringtie=2.1.4.yaml'
+    shell:
+        'stringtie --merge {input} -o {output}'
+
 '''
-scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/altadena .
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_all_rep123.gtf
+'''
+
+rule merge_maker_all_gffcompare:
+    input:
+        expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
+        diet = DIETS)
+    output:
+        'output/polyA/reference_free/maker_soap_export/{location}/allgff/rep123/soap_{location}_allgff_rep123.combined.gff'
+    conda:
+        '../envs/conda/gffcompare=0.11.2.yaml'
+    shell:
+        'gffcompare {input} -o output/polyA/reference_free/maker_soap_export/{wildcards.location}/allgff/rep123/soap_{wildcards.location}_allgff_rep123'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker_soap_export/bristol/allgff/rep123/soap_bristol_allgff_rep123.gff
+'''
+
+'''
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_all_rep123.gtf \
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/altadena/all/rep123/soap_altadena_all_rep123.gtf .
 '''
