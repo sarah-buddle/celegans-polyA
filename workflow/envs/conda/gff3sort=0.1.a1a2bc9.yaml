@@ -1,0 +1,15 @@
+name: gff3sort=0.1.a1a2bc9
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - gff3sort=0.1.a1a2bc9
+  - perl=5.26.2
+  - perl-data-compare=1.25
+  - perl-data-dumper=2.173
+  - perl-data-match=0.06
+  - perl-file-find-rule=0.34
+  - perl-number-compare=0.03
+  - perl-sort-naturally=1.03
+  - perl-string-escape=2010.002
