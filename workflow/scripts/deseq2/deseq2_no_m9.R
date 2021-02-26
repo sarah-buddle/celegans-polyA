@@ -28,4 +28,4 @@ dds <- full_dds[keep,]
 rlog_dds <- DESeq2::rlog(dds, blind = FALSE)
 
 # save rlog_dds object
-save(rlog_dds, file = snakemake@output$rlog_dds)
+saveRDS(rlog_dds, file = snakemake@output$rlog_dds)
