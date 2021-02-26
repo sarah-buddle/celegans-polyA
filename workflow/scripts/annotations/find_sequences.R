@@ -43,7 +43,8 @@ extract_sequence <- function(rownumber)
   chromosome <- new_genes$seqnames[rownumber]
   sequence <- substr(genome[chromosome], start, end)
   seqinr::write.fasta(sequence, as.string = TRUE, 
-                      name = paste(chromosome, '_', rownumber, sep = ''), 
+                      name = paste(chromosome, '_', rownumber, sep = ''),
+                      nbchar = 50000,
                       file.out = snakemake@output$sequences, open = "a")
 }
 
