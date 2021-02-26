@@ -8,7 +8,7 @@ rule soap:
         '../envs/conda/soapdenovo-trans=1.04.yaml'
     threads: 4
     shell:
-        'cd output/polyA/reference_free/soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/;'
+        'cd output/polyA/reference_free/soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate};'
         'cp ../../../../../../../scripts/soap_config.txt .;'
         "cat soap_config.txt | "
         "sed 's|^q1=|q1=/mnt/home1/miska/sb2226/workflow/{input.q1}|' | "
@@ -209,9 +209,21 @@ rule merge_maker_all_gffcompare:
     shell:
         'gffcompare {input} -o output/polyA/reference_free/maker_soap_export/{wildcards.location}/allgff/rep123/soap_{wildcards.location}_allgff_rep123'
 
+rule merge_maker_liftover_gffcompare:
+    input:
+        maker=expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', diet = DIETS),
+        liftover='input/annotations/liftover/{location}/{location}_annotation.gtf'
+    output:
+        'output/polyA/reference_free/maker_soap/{location}/allgffliftover/rep123/soap_{location}_allgffliftover_rep123.combined.gtf'
+    conda:
+        '../envs/conda/gffcompare=0.11.2.yaml'
+    shell:
+        'gffcompare {input.maker} -r {input.liftover} -o output/polyA/reference_free/maker_soap/{wildcards.location}/allgffliftover/rep123/soap_{wildcards.location}_allgffliftover_rep123'
+
+
 '''
 snakemake --profile ../snakemake_profile \
-output/polyA/reference_free/maker_soap_export/bristol/allgff/rep123/soap_bristol_allgff_rep123.gff
+output/polyA/reference_free/maker_soap/bristol/allgffliftover/rep123/soap_bristol_allgffliftover_rep123.combined.gtf
 '''
 
 '''
