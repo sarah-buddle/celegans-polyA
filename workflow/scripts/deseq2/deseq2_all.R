@@ -30,15 +30,12 @@ full_dds <- DESeq2::DESeqDataSetFromMatrix(count_matrix, colData = samples,
 # Save resulting object
 saveRDS(full_dds, file = snakemake@output$full_dds)
 
-# Pre-filter data set to remove rows with 0 and 1 counts for all
-keep <- rowSums(counts(full_dds)) > 0
-dds <- full_dds[keep,]
-
 # Transform data to make sure it is homoskedastic
 # rlog better when n < 30, vst better if not
-vst_dds <- DESeq2::vst(dds, blind = FALSE)
+vst_dds <- DESeq2::vst(full_dds, blind = FALSE)
 
 # Save rlog_dds object
 saveRDS(vst_dds, file = snakemake@output$vst_dds)
 
-
+# Testing
+test <- subset(count_matrix, bristol_as_rep1 == NA)
