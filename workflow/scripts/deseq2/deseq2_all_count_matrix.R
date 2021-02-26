@@ -1,4 +1,4 @@
-#### Creates deseq object for all data ####
+#### Creates count matrix for all data ####
 
 # Set working directory
 setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
