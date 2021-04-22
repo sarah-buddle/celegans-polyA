@@ -143,9 +143,18 @@ conda env export --no-builds | sed '$d' | sed '$d' > \
 r-ggplot2=3.3.1_rggpubr=0.4.0_r-gridextra=2.3.yaml
 conda deactivate
 
+# ggtree
 conda create --name bioconductor-ggtree=2.4.1 \
 --channel conda-forge --channel bioconda --yes bioconductor-ggtree=2.4.1
 conda activate bioconductor-ggtree=2.4.1
 conda env export --no-builds | sed '$d' | sed '$d' > \
 envs/conda/bioconductor-ggtree=2.4.1.yaml
+conda deactivate
+
+# tidyverse and rggpubr
+conda create --name r-tidyverse=1.2.1_r-ggpubr=0.4.0 \
+--channel conda-forge --channel bioconda --yes r-tidyverse=1.2.1 r-ggpubr=0.4.0
+conda activate r-tidyverse=1.2.1_r-ggpubr=0.4.0
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/r-tidyverse=1.2.1_r-ggpubr=0.4.0.yaml
 conda deactivate
