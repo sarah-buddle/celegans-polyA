@@ -1,4 +1,5 @@
 rule cluster_test:
+    ''' Test snakemake on cluster '''
   output:
     'testfile'
   shell:
