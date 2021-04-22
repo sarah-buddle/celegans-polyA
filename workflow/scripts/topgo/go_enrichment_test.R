@@ -1,17 +1,14 @@
 #### Enrichment test in gene ontology analysis of differentially expressed genes ####
 
-# Set working directory
-setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
-
 # Load packages
 library(topGO)
 
 # Load topgo_data
-load(snakemake@input$topgo_data)
+topgo_data <- readRDS(snakemake@input$topgo_data)
 
 # Enrichment test
-topgo_result <- topGO::runTest(GOdata,
+topgo_result <- topGO::runTest(topgo_data,
                                 algorithm = snakemake@wildcards$algorithm,
                                 statistic = snakemake@wildcards$statistic)
 # Save result
-save(topgo_result, file = snakemake@output$topgo_result)
+saveRDS(topgo_result, file = snakemake@output$topgo_result)
