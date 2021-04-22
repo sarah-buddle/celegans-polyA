@@ -1,8 +1,11 @@
+''' Prepare annotations and read alignments to be viewed in IGV '''
+
 LOCATIONS = ['bristol']
 DIETS = ['as','bp','hb101','m9','op50','pf']
 REPLICATES = ['rep1','rep2','rep3']
 
 rule remove_contig:
+    ''' Remove contig from Maker annotations '''
     input:
         'from_cluster/maker_annotations/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.{extension}'
     output:
@@ -16,6 +19,7 @@ output/igv/gff/no_contig/soap/bristol/all/rep123/soap_bristol_all_rep123.gtf
 '''
 
 rule gff_sort:
+    ''' Sort annotation '''
     input:
         'output/igv/gff/no_contig/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.{extension}'
     output:
@@ -27,10 +31,11 @@ rule gff_sort:
 
 '''
 snakemake --cores 1 --use-conda -R \
-output/igv/gff/sorted/soap/bristol/as/rep123/soap_bristol_as_rep123.gff3
+output/igv/gff/sorted/combinedall/bristol/all/rep123/combinedall_bristol_all_rep123.gtf
 '''
 
 rule gff2bed:
+    ''' Convert to bed file '''
     input:
         'output/igv/gff/sorted/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}.{extension}'
     output:
@@ -40,12 +45,8 @@ rule gff2bed:
     shell:
         'gff2bed < {input} > {output}'
 
-'''
-snakemake --cores 1 --use-conda \
-output/igv/gff/bed/soap/bristol/as/rep123/soap_bristol_as_rep123.bed
-'''
-
 rule index_bed:
+    ''' Index bed file '''
     input:
         'output/igv/gff/bed/{annotation_type}/{location}/{diet}/{replicate}/{annotation_type}_{location}_{diet}_{replicate}_{extension}.bed'
     output:
@@ -67,12 +68,10 @@ output/igv/gff/bed/soap/altadena/hb101/rep123/soap_altadena_hb101_rep123.bed.idx
 output/igv/gff/bed/soap/altadena/m9/rep123/soap_altadena_m9_rep123.bed.idx \
 output/igv/gff/bed/soap/altadena/op50/rep123/soap_altadena_op50_rep123.bed.idx \
 output/igv/gff/bed/soap/altadena/pf/rep123/soap_altadena_pf_rep123.bed.idx
-
-snakemake --cores 1 --use-conda \
-output/igv/gff/bed/soap/bristol/all/rep123/soap_bristol_all_rep123_gtf.bed.idx
 '''
 
 rule gtf_sort_liftover:
+    ''' Sort liftover annotation '''
     input:
         'from_cluster/liftover_annotations/{location}/liftover_{location}.gtf'
     output:
@@ -88,6 +87,7 @@ output/igv/liftover/sorted/altadena/liftover_altadena.gtf
 '''
 
 rule gff2bed_liftover:
+    ''' Convert to bed file '''
     input:
         'output/igv/liftover/sorted/{location}/liftover_{location}.gtf'
     output:
@@ -98,6 +98,7 @@ rule gff2bed_liftover:
         'gff2bed < {input} > {output}'
 
 rule index_bed_liftover:
+    ''' Index bed file '''
     input:
         'output/igv/liftover/bed/{location}/liftover_{location}.bed'
     output:
@@ -113,6 +114,7 @@ output/igv/liftover/bed/bristol/liftover_bristol.bed.idx
 '''
 
 rule bam_lists:
+    ''' Create lists of bam files to combine biological replicates into single track '''
     output:
         'output/igv/bam_lists/{location}/{diet}/{location}_{diet}.bam.list'
     shell:
