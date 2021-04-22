@@ -148,8 +148,8 @@ pf_rep1,pf_rep2,pf_rep3}_counts.txt
 '''
 
 '''
-scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/genome_guided/htseq_count/htseq_count_export
-/Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/htseq_count_export
+scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/htseq_count/htseq_count_export \
+from_cluster/
 '''
 
 
