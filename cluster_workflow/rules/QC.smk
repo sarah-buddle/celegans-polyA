@@ -8,11 +8,6 @@ READS = ['1','2']
 find . -type d -name *replicate* | xargs rename 's/replicate/rep/' .
 '''
 
-rule all:
-    input:
-        'output/polyA/QC/multiqc_untrimmed/untrimmed_multiqc.html',
-        'output/polyA/QC/multiqc_trimmed/trimmed_multiqc.html'
-
 rule rename:
     ''' Rename to follow conventions in remaining rules '''
     input:
@@ -137,19 +132,11 @@ rule multiqc_trimmed:
 
 
 '''
-snakemake --cluster-config snakemake_profile/slurm.json --use-conda \
---profile snakemake_profile --cores 2 --snakefile rules/QC.smk \
+snakemake --profile ../snakemake_profile \
 output/polyA/QC/multiqc_untrimmed/multiqc_untrimmed.html \
 output/polyA/QC/multiqc_trimmed/multiqc_trimmed.html
 '''
 
 '''
-# import all reports to local machine
-scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/fastqc_untrimmed/reports/ \
-cQC/fastqc_untrimmed
-scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/fastqc_trimmed/reports/ \
-/Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/QC/fastqc_trimmed
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/multiqc_untrimmed/multiqc_trimmed.html \
-sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/QC/multiqc_trimmed/multiqc_trimmed.html \
-/Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/QC
+Export reports to local machine to view
 '''
