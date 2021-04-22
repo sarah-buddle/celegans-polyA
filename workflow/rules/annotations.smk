@@ -294,20 +294,19 @@ snakemake --cores 1 -R --use-conda \
 output/annotations/coverage/plots/coverage_plot_comparison.tiff
 '''
 
-# Script isn't written for snakemake yet
 rule compare_gene_counts:
     ''' Calculate and plot gene counts in different annotation types '''
     input:
         script='scripts/annotations/compare_gene_counts.R',
-        granges_genes=['output/annotations/granges_genes/reference/vc2010/reference_vc2010.rds', \
-        'output/annotations/granges_genes/liftover/altadena/liftover_altadena.rds', \
-        'output/annotations/granges_genes/liftover/bristol/liftover_bristol.rds', \
-        'output/annotations/granges/stringtie/altadena/all/rep123/stringtie_altadena_all_rep123.rds', \
-        'output/annotations/granges/stringtie/bristol/all/rep123/stringtie_bristol_all_rep123.rds'],
-        annotations=['output/annotations/combined_annotations/combinedall/altadena/combinedall_altadena.gtf', \
-        'output/annotations/combined_annotations/combinedmakeronly/altadena/combinedmakeronly_altadena.gtf', \
-        'output/annotations/combined_annotations/combinedall/bristol/combinedall_bristol.gtf', \
-        'output/annotations/combined_annotations/combinedmakeronly/bristol/combinedmakeronly_bristol.gtf']
+        granges_genes_reference='output/annotations/granges_genes/reference/vc2010/reference_vc2010.rds',
+        grange_genes_liftover_altadena='output/annotations/granges_genes/liftover/altadena/liftover_altadena.rds',
+        granges_genes_liftover_bristol='output/annotations/granges_genes/liftover/bristol/liftover_bristol.rds',
+        granges_genes_stringtie_altadena='output/annotations/granges/stringtie/altadena/all/rep123/stringtie_altadena_all_rep123.rds',
+        granges_genes_stringtie_bristol='output/annotations/granges/stringtie/bristol/all/rep123/stringtie_bristol_all_rep123.rds',
+        combinedall_altadena='output/annotations/combined_annotations/combinedall/altadena/combinedall_altadena.gtf',
+        combinedmakeronly_altadena='output/annotations/combined_annotations/combinedmakeronly/altadena/combinedmakeronly_altadena.gtf',
+        combinedall_bristol='output/annotations/combined_annotations/combinedall/bristol/combinedall_bristol.gtf',
+        combinedmakeronly_bristol='output/annotations/combined_annotations/combinedmakeronly/bristol/combinedmakeronly_bristol.gtf'
     output:
         gene_count_plot='output/annotations/gene_counts/gene_counts_plot.tiff',
         gene_count_plot_rds='output/annotations/gene_counts/gene_counts_plot.rds',
@@ -322,7 +321,7 @@ snakemake --cores 1 -R --use-conda \
 output/annotations/gene_counts/gene_counts_plot.tiff
 '''
 
-rule plot_coverage_genecounts:
+rule plot_coverage_gene_counts:
     ''' Combine coverage and gene counts plots with shared legend '''
     input:
         coverage_plot='output/annotations/coverage/plots/coverage_plot_comparison.rds',
