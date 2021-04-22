@@ -1,8 +1,5 @@
 # Produce combined annotations (liftver plus new genes) and create list of new genes
 
-# Set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
-
 # Load packages
 library(GenomicRanges)
 library(plyranges)

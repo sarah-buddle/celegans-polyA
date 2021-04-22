@@ -1,8 +1,5 @@
 # Combine Maker annotations for different diets
 
-# Set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
-
 # Load packages
 library(GenomicRanges)
 library(plyranges)
