@@ -1,7 +1,4 @@
-#### Differential expression analysis ####
-
-# set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
+#### Differential expression analysis across both locations ####
 
 # Load packages
 library(DESeq2)
@@ -12,8 +9,8 @@ full_dds <- readRDS(snakemake@input$full_dds)
 
 # Perform differential expression analysis
 ddsDE <- DESeq2::DESeq(full_dds)
-dds_res <- DESeq2::results(ddsDE, contrast = c('location', 
-                                               snakemake@wildcards$location1, 
+dds_res <- DESeq2::results(ddsDE, contrast = c('location',
+                                               snakemake@wildcards$location1,
                                                snakemake@wildcards$location2))
 
 # Save dds_res object
