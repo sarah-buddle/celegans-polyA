@@ -8,7 +8,7 @@ rule soap:
         '../envs/conda/soapdenovo-trans=1.04.yaml'
     threads: 4
     shell:
-        'cd output/polyA/reference_free/soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/;'
+        'cd output/polyA/reference_free/soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate};'
         'cp ../../../../../../../scripts/soap_config.txt .;'
         "cat soap_config.txt | "
         "sed 's|^q1=|q1=/mnt/home1/miska/sb2226/workflow/{input.q1}|' | "
@@ -25,7 +25,6 @@ rule maker_soap:
         'output/polyA/reference_free/maker_soap/{location}/{diet}/{replicate}/{location}_genome.fasta.all.gff'
     conda:
         '../envs/conda/maker=2.31.10.yaml'
-    threads: 12
     shell:
         # move to correct directory
         'cd output/polyA/reference_free/maker_soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}; '
@@ -48,19 +47,19 @@ rule maker_soap:
         'gff3_merge -d {wildcards.location}_genome.fasta.maker.output/{wildcards.location}_genome.fasta_master_datastore_index.log'
 
 '''
-snakemake --cluster-config ../snakemake_profile/slurm.json --use-conda \
---profile ../snakemake_profile --cores 24 \
-output/polyA/reference_free/maker_soap/altadena/bp/rep1/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/hb101/rep1/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/m9/rep1/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/op50/rep1/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/pf/rep1/altadena_genome.fasta.all.gff
-
-snakemake --cluster-config ../snakemake_profile/slurm.json --use-conda \
---profile ../snakemake_profile --cores 36 \
-output/polyA/reference_free/maker_soap/altadena/as/rep3/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/m9/rep2/altadena_genome.fasta.all.gff \
-output/polyA/reference_free/maker_soap/altadena/m9/rep3/altadena_genome.fasta.all.gff
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker_soap/bristol/as/rep2/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/bp/rep2/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/hb101/rep2/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/m9/rep2/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/op50/rep2/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/pf/rep2/bristol_genome.fasta.all.gff
+output/polyA/reference_free/maker_soap/bristol/as/rep3/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/bp/rep3/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/hb101/rep3/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/m9/rep3/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/op50/rep3/bristol_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap/bristol/pf/rep3/bristol_genome.fasta.all.gff
 '''
 
 rule maker_rep2_soap:
@@ -178,14 +177,56 @@ snakemake --profile ../snakemake_profile \
 output/polyA/reference_free/maker_soap_export/altadena/as/rep1_2_3/altadena_genome.fasta.all.gff \
 output/polyA/reference_free/maker_soap_export/altadena/bp/rep1_2_3/altadena_genome.fasta.all.gff \
 output/polyA/reference_free/maker_soap_export/altadena/hb101/rep1_2_3/altadena_genome.fasta.all.gff \
+output/polyA/reference_free/maker_soap_export/altadena/m9/rep1_2_3/altadena_genome.fasta.all.gff \
 output/polyA/reference_free/maker_soap_export/altadena/op50/rep1_2_3/altadena_genome.fasta.all.gff \
 output/polyA/reference_free/maker_soap_export/altadena/pf/rep1_2_3/altadena_genome.fasta.all.gff
 '''
 
-'''
-scp sb2226@172.25.11.131://mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap/altadena/as/rep1_2_3/altadena_genome.fasta.all.gff \
+rule merge_maker_all_stringtie:
+    input:
+        expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
+        diet = DIETS)
+    output:
+        'output/polyA/reference_free/maker_soap_export/{location}/all/rep123/soap_{location}_all_rep123.gtf'
+    conda:
+        '../envs/conda/stringtie=2.1.4.yaml'
+    shell:
+        'stringtie --merge {input} -o {output}'
 
-scp -r sb2226@172.25.11.131://mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export \
-from_cluster/maker_annotations
-mv from_cluster/maker_annotations/
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_all_rep123.gtf
+'''
+
+rule merge_maker_all_gffcompare:
+    input:
+        expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
+        diet = DIETS)
+    output:
+        'output/polyA/reference_free/maker_soap_export/{location}/allgff/rep123/soap_{location}_allgff_rep123.combined.gff'
+    conda:
+        '../envs/conda/gffcompare=0.11.2.yaml'
+    shell:
+        'gffcompare {input} -o output/polyA/reference_free/maker_soap_export/{wildcards.location}/allgff/rep123/soap_{wildcards.location}_allgff_rep123'
+
+rule merge_maker_liftover_gffcompare:
+    input:
+        maker=expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', diet = DIETS),
+        liftover='input/annotations/liftover/{location}/{location}_annotation.gtf'
+    output:
+        'output/polyA/reference_free/maker_soap/{location}/allgffliftover/rep123/soap_{location}_allgffliftover_rep123.combined.gtf'
+    conda:
+        '../envs/conda/gffcompare=0.11.2.yaml'
+    shell:
+        'gffcompare {input.maker} -r {input.liftover} -o output/polyA/reference_free/maker_soap/{wildcards.location}/allgffliftover/rep123/soap_{wildcards.location}_allgffliftover_rep123'
+
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/reference_free/maker_soap/bristol/allgffliftover/rep123/soap_bristol_allgffliftover_rep123.combined.gtf
+'''
+
+'''
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_all_rep123.gtf \
+scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/altadena/all/rep123/soap_altadena_all_rep123.gtf .
 '''

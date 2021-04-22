@@ -7,7 +7,7 @@ setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
 library(GenomicRanges)
 
 # Load annotation
-load(file = snakemake@input$granges)
+annotation <- readRDS(file = snakemake@input$granges)
 
 # Reduce overlapping ranges
 reduced_annotation <- GenomicRanges::reduce(annotation)
@@ -16,18 +16,21 @@ reduced_annotation <- GenomicRanges::reduce(annotation)
 coverage <- sum(width(reduced_annotation))
 
 # Save output
-save(coverage, file = snakemake@output$coverage)
+saveRDS(coverage, file = snakemake@output$coverage)
 
 # Write output to new row of coverage_table
 
 # Forms sample name e.g. soap_bristol_as_rep1 or liftover_bristol
-if(snakemake@wildcards$annotation_type == 'liftover'){
-  sample_name <- paste('liftover_', snakemake@wildcards$location, sep = "")
+if(snakemake@wildcards$annotation_type == 'liftover' | 
+   snakemake@wildcards$annotation_type ==  'reference'){
+  sample_name <- paste(snakemake@wildcards$annotation_type, 
+                       snakemake@wildcards$location, sep = "_")
   
   # New row
   # new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
-  new_row <- c(sample_name, 'liftover', snakemake@wildcards$location, NA, NA, coverage)
-  
+  new_row <- c(sample_name, snakemake@wildcards$annotation_type, 
+               snakemake@wildcards$location, 'previous_annotation', NA, coverage)
+
 }else{
   #sample_name <- 'soap_bristol_as_rep2'
   sample_name <- paste(snakemake@wildcards$annotation_type, '_',

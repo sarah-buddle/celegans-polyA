@@ -1,0 +1,8 @@
+name: igvtools=2.5.3
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - igvtools=2.5.3
+  - openjdk=11.0.8

@@ -1,4 +1,7 @@
 include: 'rules/deseq2.smk'
+include: 'rules/deseq2_new.smk'
 include: 'rules/topgo.smk'
 
 include: 'rules/annotations.smk'
+
+include: 'rules/igv.smk'
