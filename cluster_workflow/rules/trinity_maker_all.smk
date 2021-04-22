@@ -1,4 +1,9 @@
+''' De novo assemble transcripts using Trinity and run MAKER2 '''
+
+''' NOt used in report due to slow speed '''
+
 rule trinity:
+    ''' De novo transcriptome assembly '''
     input:
         trimmed1="output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1_trimmed.fastq",
         trimmed2="output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads2/{location}_{diet}_{replicate}_2_trimmed.fastq"
@@ -10,9 +15,10 @@ rule trinity:
     shell:
         "Trinity --seqType fq --max_memory 60G --CPU {threads} \
         --left {input.trimmed1} --right {input.trimmed2} \
-        --output otuput/polyA/reference_free/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/"
+        --output output/polyA/reference_free/trinity/{wildcards.location}/{wildcards.diet}/{wildcards.replicate}/trinity/"
 
 rule maker:
+    ''' Run maker on single biological replicate '''
     input:
         genome='output/polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
         trinity='output/polyA/reference_free/trinity/{location}/{diet}/{replicate}/trinity/Trinity.fasta',
@@ -50,6 +56,7 @@ output/polyA/reference_free/maker/bristol/m9/rep2/bristol_genome.fasta.all.gff
 
 
 rule maker_rep2:
+    ''' Run Maker on rep2 using info from rep1 '''
     input:
         premade='polyA/reference_free/maker/{location}/{diet}/rep1/{location}_genome.fasta.all.gff',
         genome='polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
@@ -91,6 +98,7 @@ rule maker_rep2:
         'gff3_merge -d {wildcards.location}_genome.fasta.maker.output/{wildcards.location}_genome.fasta_master_datastore_index.log'
 
 rule maker_rep3:
+    ''' Run Maker on rep3 using info from rep1 and 2 '''
     input:
         premade='polyA/reference_free/maker/{location}/{diet}/rep1_2/{location}_genome.fasta.all.gff',
         genome='polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
