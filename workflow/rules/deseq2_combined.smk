@@ -170,6 +170,7 @@ snakemake --cores 1 --use-conda \
 output/deseq2
 '''
 
+# uses different theshold for expression that other plots
 rule count_percentage_genes_expressed_combined:
     ''' Count percentage of total genes expressed for single location '''
     input:
@@ -189,6 +190,7 @@ output/deseq2_combined/expressed_genes/bristol/bristol_expressed_genes.rds \
 output/deseq2_combined/expressed_genes/altadena/altadena_expressed_genes.rds
 '''
 
+# uses different theshold for expression that other plots
 rule plot_percentage_expression_all_combined:
     ''' Plot percentage of total genes exoressed for both locations '''
     input:
@@ -243,7 +245,7 @@ output/deseq2_combined/results_location/all/all_bristol_altadena.rds
 rule proportion_new_genes_de_combined:
     ''' Calculate proportion of differentially expressed genes that are accessory '''
     input:
-        script='scripts/deseq2/proportion_new_genes_de_3.R',
+        script='scripts/deseq2/proportion_new_genes_de.R',
         dds_res=['output/deseq2_combined/results_location/all/all_bristol_altadena.rds', \
                 'output/deseq2_combined/results/bristol/bristol_m9_op50.rds', \
                 'output/deseq2_combined/results/bristol/bristol_m9_pf.rds', \
@@ -262,7 +264,7 @@ rule proportion_new_genes_de_combined:
     conda:
         '../envs/conda/r-tidyverse=1.2.1.yaml'
     script:
-        '../scripts/deseq2/proportion_new_genes_de_3.R'
+        '../scripts/deseq2/proportion_new_genes_de.R'
 
 '''
 snakemake --cores 1 --use-conda -R \
