@@ -1,3 +1,5 @@
+''' Perform homology analysis of new genes using BLAST '''
+
 LOCATIONS = ['bristol']
 DIETS = ['as','bp','hb101','m9','op50','pf']
 REPLICATES = ['rep1','rep2','rep3']
@@ -26,7 +28,7 @@ output/blast/new_gene_sequences/bristol/bristol.fa
 '''
 
 rule blast_new_sequences_genome:
-    ''' Blast new sequence against reference genome '''
+    ''' Blast new sequence against VC2010 reference genome '''
     input:
         sequences='output/blast/new_gene_sequences/{location}/{location}.fa',
         reference_genome='input/genomes/vc2010_reference/c_elegans.PRJEB28388.WS279.genomic.fa'
@@ -58,6 +60,7 @@ output/blast/vc2010_genome_no_hits/altadena/vc2010_genome_no_hits_altadena.txt
 '''
 
 rule no_hits_list_genome:
+    ''' Extract gene names from above list '''
     input:
         'output/blast/vc2010_genome_no_hits/{location}/vc2010_genome_no_hits_{location}.txt'
     output:
@@ -104,6 +107,7 @@ output/blast/vc2010_transcripts_no_hits/altadena/vc2010_transcripts_no_hits_alta
 
 
 rule no_hits_list_transcripts:
+    ''' Extract gene names from above list '''
     input:
         'output/blast/vc2010_transcripts_no_hits/{location}/vc2010_transcripts_no_hits_{location}.txt'
     output:
@@ -116,7 +120,8 @@ snakemake --cores 1 --use-conda \
 output/blast/vc2010_transcripts_no_hits/altadena/names_vc2010_transcripts_no_hits_altadena.txt
 '''
 
-rule no_hits_sequences:
+rule no_hits_sequences_transcripts:
+    ''' Find sequences of genes with no hits to VC2010 transcripts '''
     input:
         script='scripts/annotations/no_hits_sequences.R',
         no_hits_names='output/blast/vc2010_transcripts_no_hits/{location}/names_vc2010_transcripts_no_hits_{location}.txt',
@@ -134,7 +139,7 @@ output/blast/vc2010_transcripts_no_hits/altadena/vc2010_transcripts_no_hits_alta
 '''
 
 rule blast_new_sequences_transcripts_related_species2:
-    ''' Blast new sequence against reference transcripsts '''
+    ''' Blast new sequence against transcripts from related species '''
     input:
         sequences='output/blast/vc2010_transcripts_no_hits/{location}/vc2010_transcripts_no_hits_{location}.fa',
         reference_transcripts='input/reference_transcripts/c_{species}.WS279.mRNA_transcripts.fa'
@@ -159,6 +164,7 @@ output/blast/related_species_transcripts/altadena/c.tropicalis.PRJNA53597/altade
 '''
 
 rule extract_hits_related_species_transcripts:
+    ''' Extract hits from above '''
     input:
         expand('output/blast/related_species_transcripts/{{location}}/c.{species}/{{location}}_c.{species}_transcripts.txt', \
         species = SPECIES)
@@ -173,6 +179,7 @@ output/blast/related_species_transcripts/bristol/related_species_transcripts_hit
 '''
 
 rule hits_related_species_list_transcripts:
+    ''' Extract gene names from above '''
     input:
         'output/blast/related_species_transcripts/{location}/related_species_transcripts_hits_{location}.txt'
     output:
@@ -220,6 +227,7 @@ output/blast/vc2010_proteins_no_hits/altadena/vc2010_proteins_no_hits_altadena.t
 '''
 
 rule vc2010_proteins_no_hits_list:
+    ''' Extract gene names from above list '''
     input:
         'output/blast/vc2010_proteins_no_hits/{location}/vc2010_proteins_no_hits_{location}.txt'
     output:
@@ -250,7 +258,7 @@ output/blast/vc2010_proteins_no_hits/altadena/vc2010_proteins_no_hits_altadena.f
 '''
 
 rule blast_new_sequences_proteins_related_species2:
-    ''' Blast new sequence against reference transcripsts '''
+    ''' Blast new sequence against reference proteins '''
     input:
         sequences='output/blast/vc2010_proteins_no_hits/{location}/vc2010_proteins_no_hits_{location}.fa',
         reference_proteins='input/reference_proteins/c_{species}.WS279.protein.fa'
@@ -275,6 +283,7 @@ output/blast/related_species_proteins/altadena/c.tropicalis.PRJNA53597/altadena_
 '''
 
 rule extract_hits_related_species_proteins:
+    ''' Extract hits from above '''
     input:
         expand('output/blast/related_species_proteins/{{location}}/c.{species}/{{location}}_c.{species}_proteins.txt', \
         species = SPECIES)
@@ -289,6 +298,7 @@ output/blast/related_species_proteins/bristol/related_species_proteins_hits_bris
 '''
 
 rule hits_related_species_list_proteins:
+    ''' Extract gene names from above '''
     input:
         'output/blast/related_species_proteins/{location}/related_species_proteins_hits_{location}.txt'
     output:
@@ -301,8 +311,9 @@ snakemake --cores 1 --use-conda \
 output/blast/related_species_proteins/bristol/names_related_species_proteins_hits_bristol.txt
 '''
 
+# Bug in snakemake rule but works fine running script in R
 rule venn:
-    '''Snakemake rule not working '''
+    ''' Venn diagram to visualise above '''
     input:
         script='scripts/annotations/blast_table.R',
         new_gene_counts='output/annotations/new_gene_expression/data/{location}/new_gene_counts_{location}.rds',
@@ -322,7 +333,25 @@ snakemake --cores 1 --use-conda -R \
 output/blast/venn/bristol/venn_bristol.tiff
 '''
 
+rule tree:
+    ''' Produce phylogenetic tree of Caenorhabditis (uses Cristian's data) '''
+    input:
+        script='scripts/annotations/tree.R',
+        tree='input/tree/SpeciesTree_rooted_node_labels.txt'
+    output:
+        plot='output/blast/tree/tree_plot.tiff'
+    conda:
+        '../envs/conda/bioconductor-ggtree=2.4.1.yaml'
+    script:
+        '../scripts/annotations/tree.R'
+
+'''
+snakemake --cores 1 --use-conda -R \
+output/blast/tree/tree_plot.tiff
+'''
+
 rule related_species_plot:
+    ''' Plot of genes that have homology to related species '''
     input:
         script='scripts/annotations/related_species_plot.R',
         counts_bristol='output/blast/count_table/bristol/count_table_bristol.rds',
@@ -337,20 +366,4 @@ rule related_species_plot:
 '''
 snakemake --cores 1 --use-conda -R -n \
 output/blast/related_species_plot/related_species_plot.tiff
-'''
-
-rule tree:
-    input:
-        script='scripts/annotations/tree.R',
-        tree='input/tree/SpeciesTree_rooted_node_labels.txt'
-    output:
-        plot='output/blast/tree/tree_plot.tiff'
-    conda:
-        '../envs/conda/bioconductor-ggtree=2.4.1.yaml'
-    script:
-        '../scripts/annotations/tree.R'
-
-'''
-snakemake --cores 1 --use-conda -R \
-output/blast/tree/tree_plot.tiff
 '''
