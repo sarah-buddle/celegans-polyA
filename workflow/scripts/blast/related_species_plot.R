@@ -1,8 +1,5 @@
 # Plot of new genes with homology to transcripts and proteins in related species
 
-# Set working directory
-setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
-
 # Load packages
 library(tidyverse)
 

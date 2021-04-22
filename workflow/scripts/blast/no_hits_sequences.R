@@ -1,8 +1,5 @@
 # Find sequences of new genes from their names
 
-# Set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
-
 # Load packages
 library(seqinr)
 

@@ -1,8 +1,5 @@
 # Produce phylogenetic tree of species used in blast analysis
 
-# Set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
-
 # Load packages
 library(ggtree)
 
