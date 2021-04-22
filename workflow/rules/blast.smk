@@ -311,25 +311,25 @@ snakemake --cores 1 --use-conda \
 output/blast/related_species_proteins/bristol/names_related_species_proteins_hits_bristol.txt
 '''
 
-# Bug in snakemake rule but works fine running script in R
 rule venn:
     ''' Venn diagram to visualise above '''
     input:
-        script='scripts/blast/blast_table.R',
+        script='scripts/blast/venn.R',
         new_gene_counts='output/annotations/new_gene_expression/data/{location}/new_gene_counts_{location}.rds',
         no_hits_genome='output/blast/vc2010_genome_no_hits/{location}/names_vc2010_genome_no_hits_{location}.txt',
         no_hits_transcripts='output/blast/vc2010_transcripts_no_hits/{location}/names_vc2010_transcripts_no_hits_{location}.txt',
         no_hits_proteins='output/blast/vc2010_proteins_no_hits/{location}/names_vc2010_proteins_no_hits_{location}.txt',
         hits_related_species='output/blast/related_species_transcripts/{location}/names_related_species_transcripts_hits_{location}.txt'
     output:
-        'output/blast/venn/{location}/venn_{location}.tiff'
+        venn='output/blast/venn/{location}/venn_{location}.tiff',
+        legend='output/blast/venn/{location}/venn_legend_{location}.tiff'
     conda:
-        '../envs/conda/r-tidyverse=1.2.1.yaml'
+        '../envs/conda/r-tidyverse=1.2.1_r-ggpubr=0.4.0.yaml'
     script:
-        '../scripts/blast/blast_table.R'
+        '../scripts/blast/venn.R'
 
 '''
-snakemake --cores 1 --use-conda -R \
+snakemake --cores 1 --use-conda --allowed-rules venn \
 output/blast/venn/bristol/venn_bristol.tiff
 '''
 
@@ -364,6 +364,6 @@ rule related_species_plot:
         '../scripts/blast/related_species_plot.R'
 
 '''
-snakemake --cores 1 --use-conda -R -n \
+snakemake --cores 1 --use-conda -R \
 output/blast/related_species_plot/related_species_plot.tiff
 '''
