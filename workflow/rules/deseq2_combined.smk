@@ -62,6 +62,7 @@ rule deseq2_no_m9_combined:
 
 
 rule deseq2_PCA_no_m9_combined:
+    ''' PCA plot of above '''
     input:
         script='scripts/deseq2/deseq2_pca.R',
         rlog_dds='output/deseq2_combined/data/{location}/{location}_no_m9_rlog_dds.rds'
@@ -80,6 +81,7 @@ output/deseq2_combined/plots/bristol/bristol_deseq2_pca_no_m9.tiff
 
 
 rule deseq2_all_count_matrix_combined:
+    ''' Produce count matrix for both locations '''
     input:
         script='scripts/deseq2/deseq2_all_count_matrix.R',
         htseq_count=expand('from_cluster/htseq_count_export_combined/{location}_{diet}_{replicate}_counts.txt', \
@@ -239,7 +241,7 @@ output/deseq2_combined/results_location/all/all_bristol_altadena.rds
 '''
 
 rule proportion_new_genes_de_combined:
-    ''' Calculate proportin of differentially expressed genes that are accessory '''
+    ''' Calculate proportion of differentially expressed genes that are accessory '''
     input:
         script='scripts/deseq2/proportion_new_genes_de_3.R',
         dds_res=['output/deseq2_combined/results_location/all/all_bristol_altadena.rds', \
