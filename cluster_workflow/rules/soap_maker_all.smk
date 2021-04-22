@@ -1,4 +1,9 @@
+''' De novo assemble transcripts using SOAPdenovo-trans and run MAKER2 '''
+
+''' When running soap, need to specify global file path so adjust the lines specified '''
+
 rule soap:
+    ''' De novo transcriptome assembly '''
     input:
         q1='output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads1/{location}_{diet}_{replicate}_1_trimmed.fastq',
         q2='output/polyA/QC/trimmed_fastq/{location}/{diet}/{replicate}/reads2/{location}_{diet}_{replicate}_2_trimmed.fastq'
@@ -6,17 +11,17 @@ rule soap:
         'output/polyA/reference_free/soap/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.scafSeq'
     conda:
         '../envs/conda/soapdenovo-trans=1.04.yaml'
-    threads: 4
     shell:
         'cd output/polyA/reference_free/soap/{wildcards.location}/{wildcards.diet}/{wildcards.replicate};'
         'cp ../../../../../../../scripts/soap_config.txt .;'
         "cat soap_config.txt | "
-        "sed 's|^q1=|q1=/mnt/home1/miska/sb2226/workflow/{input.q1}|' | "
-        "sed 's|^q2=|q2=/mnt/home1/miska/sb2226/workflow/{input.q2}|' > soap_config2.txt;"
+        "sed 's|^q1=|q1=/mnt/home1/miska/sb2226/workflow/{input.q1}|' | " # adjust global file path
+        "sed 's|^q2=|q2=/mnt/home1/miska/sb2226/workflow/{input.q2}|' > soap_config2.txt;" # adjust global file path
         'mv soap_config2.txt soap_config.txt;'
         'SOAPdenovo-Trans-127mer all -s soap_config.txt -o {wildcards.location}_{wildcards.diet}_{wildcards.replicate}'
 
 rule maker_soap:
+    ''' Run maker on single biological replicate '''
     input:
         genome='output/polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
         soap='output/polyA/reference_free/soap/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.scafSeq',
@@ -63,6 +68,7 @@ output/polyA/reference_free/maker_soap/bristol/pf/rep3/bristol_genome.fasta.all.
 '''
 
 rule maker_rep2_soap:
+    ''' Run Maker on rep2 using info from rep1 '''
     input:
         premade='output/polyA/reference_free/maker_soap/{location}/{diet}/rep1/{location}_genome.fasta.all.gff',
         genome='output/polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
@@ -114,6 +120,7 @@ output/polyA/reference_free/maker_soap/altadena/pf/rep1_2/altadena_genome.fasta.
 '''
 
 rule maker_rep3_soap:
+    ''' Run Maker on rep3 using info from rep1 and 2 '''
     input:
         premade='output/polyA/reference_free/maker_soap/{location}/{diet}/rep1_2/{location}_genome.fasta.all.gff',
         genome='output/polyA/reference_free/repeatmasker/{location}/{location}_genome.fasta.masked',
@@ -165,6 +172,7 @@ output/polyA/reference_free/maker_soap/altadena/pf/rep1_2_3/altadena_genome.fast
 '''
 
 rule maker_soap_export:
+    ''' Move to single file for export '''
     input:
         'output/polyA/reference_free/maker_soap/{location}/{diet}/rep1_2_3/{location}_genome.fasta.all.gff'
     output:
@@ -182,7 +190,14 @@ output/polyA/reference_free/maker_soap_export/altadena/op50/rep1_2_3/altadena_ge
 output/polyA/reference_free/maker_soap_export/altadena/pf/rep1_2_3/altadena_genome.fasta.all.gff
 '''
 
+'''
+Export output/polyA/reference_free/maker_soap_export to workflow/from_cluster on local machine
+'''
+
+''' Merge Maker-derived annotations - not used in final report because this step is done using a custom scrip in R '''
+
 rule merge_maker_all_stringtie:
+    ''' Merge maker annotations using stringtie-merge '''
     input:
         expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
         diet = DIETS)
@@ -199,6 +214,7 @@ output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_al
 '''
 
 rule merge_maker_all_gffcompare:
+    ''' Merge maker annotations using gffcompare '''
     input:
         expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', \
         diet = DIETS)
@@ -210,6 +226,7 @@ rule merge_maker_all_gffcompare:
         'gffcompare {input} -o output/polyA/reference_free/maker_soap_export/{wildcards.location}/allgff/rep123/soap_{wildcards.location}_allgff_rep123'
 
 rule merge_maker_liftover_gffcompare:
+    ''' Merge maker and liftover annotations using gffcompare '''
     input:
         maker=expand('output/polyA/reference_free/maker_soap/{{location}}/{diet}/rep1_2_3/{{location}}_genome.fasta.all.gff', diet = DIETS),
         liftover='input/annotations/liftover/{location}/{location}_annotation.gtf'
@@ -224,9 +241,4 @@ rule merge_maker_liftover_gffcompare:
 '''
 snakemake --profile ../snakemake_profile \
 output/polyA/reference_free/maker_soap/bristol/allgffliftover/rep123/soap_bristol_allgffliftover_rep123.combined.gtf
-'''
-
-'''
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/bristol/all/rep123/soap_bristol_all_rep123.gtf \
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/reference_free/maker_soap_export/altadena/all/rep123/soap_altadena_all_rep123.gtf .
 '''
