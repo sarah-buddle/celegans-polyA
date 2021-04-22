@@ -11,7 +11,7 @@ SPECIES = ['brenneri.PRJNA20035','briggsae.PRJNA10731','inopinata.PRJDB5687', \
 rule find_sequences:
     '''Makes fasta files of all the new genes'''
     input:
-        script='scripts/annotations/find_sequences.R',
+        script='scripts/blast/find_sequences.R',
         allnewgenes=ancient('output/annotations/combined_annotations/combinedall/altadena/allnewgenes_altadena.rds'),
         genome=expand('input/genomes/{{location}}_genome_chr/{{location}}_genome_{chromosome}.fa', \
         chromosome = CHROMOSOMES)
@@ -20,7 +20,7 @@ rule find_sequences:
     conda:
         '../envs/conda/r-seqinr=3.4_5.yaml'
     script:
-        '../scripts/annotations/find_sequences.R'
+        '../scripts/blast/find_sequences.R'
 
 '''
 snakemake --cores 1 --use-conda -R \
@@ -123,7 +123,7 @@ output/blast/vc2010_transcripts_no_hits/altadena/names_vc2010_transcripts_no_hit
 rule no_hits_sequences_transcripts:
     ''' Find sequences of genes with no hits to VC2010 transcripts '''
     input:
-        script='scripts/annotations/no_hits_sequences.R',
+        script='scripts/blast/no_hits_sequences.R',
         no_hits_names='output/blast/vc2010_transcripts_no_hits/{location}/names_vc2010_transcripts_no_hits_{location}.txt',
         sequences='output/blast/new_gene_sequences/{location}/{location}.fa'
     output:
@@ -131,7 +131,7 @@ rule no_hits_sequences_transcripts:
     conda:
         '../envs/conda/r-seqinr=3.4_5.yaml'
     script:
-        '../scripts/annotations/no_hits_sequences.R'
+        '../scripts/blast/no_hits_sequences.R'
 
 '''
 snakemake --cores 1 --use-conda \
@@ -242,7 +242,7 @@ output/blast/vc2010_proteins_no_hits/altadena/names_vc2010_proteins_no_hits_alta
 
 rule vc2010_proteins_no_hits_sequences:
     input:
-        script='scripts/annotations/no_hits_sequences.R',
+        script='scripts/blast/no_hits_sequences.R',
         no_hits_names='output/blast/vc2010_proteins_no_hits/{location}/names_vc2010_proteins_no_hits_{location}.txt',
         sequences='output/blast/new_gene_sequences/{location}/{location}.fa'
     output:
@@ -250,7 +250,7 @@ rule vc2010_proteins_no_hits_sequences:
     conda:
         '../envs/conda/r-seqinr=3.4_5.yaml'
     script:
-        '../scripts/annotations/no_hits_sequences.R'
+        '../scripts/blast/no_hits_sequences.R'
 
 '''
 snakemake --cores 1 --use-conda \
@@ -315,7 +315,7 @@ output/blast/related_species_proteins/bristol/names_related_species_proteins_hit
 rule venn:
     ''' Venn diagram to visualise above '''
     input:
-        script='scripts/annotations/blast_table.R',
+        script='scripts/blast/blast_table.R',
         new_gene_counts='output/annotations/new_gene_expression/data/{location}/new_gene_counts_{location}.rds',
         no_hits_genome='output/blast/vc2010_genome_no_hits/{location}/names_vc2010_genome_no_hits_{location}.txt',
         no_hits_transcripts='output/blast/vc2010_transcripts_no_hits/{location}/names_vc2010_transcripts_no_hits_{location}.txt',
@@ -326,7 +326,7 @@ rule venn:
     conda:
         '../envs/conda/r-tidyverse=1.2.1.yaml'
     script:
-        '../scripts/annotations/blast_table.R'
+        '../scripts/blast/blast_table.R'
 
 '''
 snakemake --cores 1 --use-conda -R \
@@ -336,14 +336,14 @@ output/blast/venn/bristol/venn_bristol.tiff
 rule tree:
     ''' Produce phylogenetic tree of Caenorhabditis (uses Cristian's data) '''
     input:
-        script='scripts/annotations/tree.R',
+        script='scripts/blast/tree.R',
         tree='input/tree/SpeciesTree_rooted_node_labels.txt'
     output:
         plot='output/blast/tree/tree_plot.tiff'
     conda:
         '../envs/conda/bioconductor-ggtree=2.4.1.yaml'
     script:
-        '../scripts/annotations/tree.R'
+        '../scripts/blast/tree.R'
 
 '''
 snakemake --cores 1 --use-conda -R \
@@ -353,7 +353,7 @@ output/blast/tree/tree_plot.tiff
 rule related_species_plot:
     ''' Plot of genes that have homology to related species '''
     input:
-        script='scripts/annotations/related_species_plot.R',
+        script='scripts/blast/related_species_plot.R',
         counts_bristol='output/blast/count_table/bristol/count_table_bristol.rds',
         counts_altadena='output/blast/count_table/altadena/count_table_altadena.rds'
     output:
@@ -361,7 +361,7 @@ rule related_species_plot:
     conda:
         '../envs/conda/r-tidyverse=1.2.1.yaml'
     script:
-        '../scripts/annotations/related_species_plot.R'
+        '../scripts/blast/related_species_plot.R'
 
 '''
 snakemake --cores 1 --use-conda -R -n \
