@@ -1,8 +1,5 @@
 #### Gene ontology analysis of differentially expressed genes ####
 
-# Set working directory
-setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
-
 # Load packages
 library(topGO)
 
@@ -13,7 +10,7 @@ geneID2GO <- topGO::readMappings(file = snakemake@input$wbid2go)
 geneUniverse <- names(geneID2GO)
 
 # Load dds_res
-load(file = snakemake@input$dds_res)
+dds_res <- readRDS(file = snakemake@input$dds_res)
 
 # Create list of most differentially expressed genes
 
@@ -31,13 +28,12 @@ geneList <- factor(as.integer(geneUniverse %in% genesOfInterest))
 names(geneList) <- geneUniverse
 
 # Combine the above into topGOdata object
-GOdata <- new("topGOdata", 
+GOdata <- new("topGOdata",
               ontology="BP", # BP = biological process, MF = molecular function, CC = cellular component
-              allGenes=geneList,  
+              allGenes=geneList,
               annot = annFUN.gene2GO, # using user-defined mapping of genes to GO terms
               gene2GO = geneID2GO,
               nodeSize = 10) # Avoids problems with GP terms with few annotated genes being enriched due to statistical artefact
 
 # Save topGO data object
-save(GOdata, file = snakemake@output$topgo_data)
-
+saveRDS(GOdata, file = snakemake@output$topgo_data)

@@ -1,8 +1,5 @@
 #### Creates DESeq2 object without m9/starvation diet treatment ####
 
-# Set working directory
-setwd("~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow")
-
 # Load packages
 library(DESeq2)
 
@@ -16,7 +13,7 @@ samples <- subset(samples, location == snakemake@wildcards$location)
 samples <- subset(samples, diet != "m9")
 
 # Make DESeqDataSet object from HTSeq-count data
-full_dds <- DESeq2::DESeqDataSetFromHTSeqCount(samples, "from_cluster/htseq_count_export", 
+full_dds <- DESeq2::DESeqDataSetFromHTSeqCount(samples, "from_cluster/htseq_count_export",
                                                design = ~ diet)
 
 # pre-filter data set to remove rows with 0 and 1 counts for all

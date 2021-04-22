@@ -4,13 +4,13 @@ include: 'rules/cluster_test.smk'
 # QC
 include: 'rules/QC.smk'
 
-# Genome-guided alignment, assembly and read counting
+# Genome-guided alignment, assembly and read counting for liftiver
 include: 'rules/genome_guided.smk'
 
 # Reference-free assembly and annotations
 include: 'rules/repeatmasker.smk'
 include: 'rules/soap_maker_all.smk'
 include: 'rules/trinity_maker_all.smk'
-include: 'rules/maker_noest.smk'
-include: 'rules/decontamination.smk'
-include: 'rules/genome_guided_maker.smk'
+
+# Read counting for new combined annotations
+include: 'rules/genome_guided_combined.smk'

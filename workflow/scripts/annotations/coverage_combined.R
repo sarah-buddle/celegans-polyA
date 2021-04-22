@@ -1,10 +1,11 @@
-#### Calculate coverage of the annotations ####
+#### Calculare coverage of a combined annotation ####
 
 # Load packages
 library(GenomicRanges)
+library(rtracklayer)
 
 # Load annotation
-annotation <- readRDS(file = snakemake@input$granges)
+annotation <- rtracklayer::import(snakemake@input$annotation)
 
 # Reduce overlapping ranges
 reduced_annotation <- GenomicRanges::reduce(annotation)
@@ -18,29 +19,12 @@ saveRDS(coverage, file = snakemake@output$coverage)
 # Write output to new row of coverage_table
 
 # Forms sample name e.g. soap_bristol_as_rep1 or liftover_bristol
-if(snakemake@wildcards$annotation_type == 'liftover' |
-   snakemake@wildcards$annotation_type ==  'reference'){
-  sample_name <- paste(snakemake@wildcards$annotation_type,
-                       snakemake@wildcards$location, sep = "_")
+sample_name <- paste(snakemake@wildcards$source,
+                       snakemake@wildcards$location, 'all_rep123', sep = "_")
 
-  # New row
-  # new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
-  new_row <- c(sample_name, snakemake@wildcards$annotation_type,
-               snakemake@wildcards$location, 'previous_annotation', NA, coverage)
+new_row <- c(sample_name, snakemake@wildcards$source,
+               snakemake@wildcards$location, 'all', 'rep123', coverage)
 
-}else{
-  #sample_name <- 'soap_bristol_as_rep2'
-  sample_name <- paste(snakemake@wildcards$annotation_type, '_',
-                        snakemake@wildcards$location, '_',
-                        snakemake@wildcards$diet, '_',
-                        snakemake@wildcards$replicate, sep = "")
-
-  # New row
-  # new_row <- c(sample_name, 'soap', 'bristol', 'as', 'rep2', 100)
-  new_row <- c(sample_name, snakemake@wildcards$annotation_type,
-               snakemake@wildcards$location, snakemake@wildcards$diet,
-               snakemake@wildcards$replicate, coverage)
-}
 
 # Making or updating coverage_table.txt
 # Checks whether coverage_table.txt file already exists
@@ -75,5 +59,3 @@ if(file.exists('output/annotations/coverage/coverage_table.txt') == TRUE) {
   write.table(coverage_table, file = 'output/annotations/coverage/coverage_table.txt',
               col.names = FALSE, row.names = FALSE)
 }
-
-# coverage_table <- read.table('output/annotations/coverage/coverage_table.txt', header = TRUE)

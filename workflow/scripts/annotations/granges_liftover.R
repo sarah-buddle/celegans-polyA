@@ -1,18 +1,16 @@
-#### Make GRanges object ####
+#### Make GRanges object for liftover annotation ####
 
 # Load packages
 library(rtracklayer)
+library(plyranges)
 
 # Import annotation
-# annotation <- rtracklayer::import('from_cluster/maker_annotations/trinity/bristol/as/rep2/trinity_bristol_as_rep2.gff')
 # annotation <- rtracklayer::import('from_cluster/liftover_annotations/altadena/liftover_altadena.gtf')
 annotation <- rtracklayer::import(snakemake@input$annotation)
 
-# Remove rows corresponding to contigs
-annotation <- annotation[which(annotation$type != 'contig'), ]
-
-# Just include genes
-annotation_genes <- annotation[which(annotation$type == 'gene'), ]
+annotation_genes <- subset(annotation, type == 'gene') %>%
+  subset(gene_biotype == 'protein_coding') %>%
+  unique(.)
 
 # Save output
 saveRDS(annotation, file = snakemake@output$granges)

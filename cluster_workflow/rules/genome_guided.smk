@@ -1,3 +1,5 @@
+''' Aligns reads to genome and produces StringTie annotations '''
+
 LOCATIONS = ['altadena', 'bristol']
 DIETS = ['as','bp','hb101','m9','op50','pf']
 REPLICATES = ['rep1','rep2','rep3']
@@ -32,7 +34,6 @@ rule index_genome:
         'hisat2-build --ss {input.ss} --exon {input.exon} {input.genome} \
         output/polyA/genome_guided/annotations/{wildcards.location}/indexes'
 
-
 rule hisat2:
     ''' Align reads to the genome '''
     input:
@@ -61,6 +62,7 @@ rule sam_to_sorted_bam:
 
 
 rule index_bam:
+    ''' Index bam files for viewing in IGV '''
     input:
         'output/polyA/genome_guided/sorted_bam/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.bam'
     output:
@@ -106,54 +108,6 @@ output/polyA/genome_guided/sorted_bam/altadena/pf/rep2/altadena_pf_rep2.bam.bai 
 output/polyA/genome_guided/sorted_bam/altadena/pf/rep3/altadena_pf_rep3.bam.bai
 '''
 
-rule htseq_count:
-    ''' counts reads mapping to each gene in reference annotation '''
-    input:
-        bam='output/polyA/genome_guided/sorted_bam/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.bam',
-        annotation='output/polyA/genome_guided/annotations/{location}/{location}_annotation.gtf'
-    output:
-        'output/polyA/genome_guided/htseq_count/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}_counts.txt'
-    conda:
-        '../envs/conda/htseq=0.12.4.yaml'
-    shell:
-        'htseq-count --stranded=reverse {input.bam} {input.annotation} > {output}'
-
-'''
-snakemake --profile ../snakemake_profile -R \
-output/polyA/genome_guided/htseq_count/altadena/as/rep1/altadena_as_rep1_counts.txt
-'''
-
-rule htseq_count_export:
-    ''' moves count data to single file for export to local machine '''
-    input:
-        expand('output/polyA/genome_guided/htseq_count/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}_counts.txt', \
-        location=LOCATIONS, diet=DIETS, replicate=REPLICATES)
-    output:
-        'output/polyA/genome_guided/htseq_count/htseq_count_export/{location}_{diet}_{replicate}_counts.txt'
-    shell:
-        'cp {input} output/polyA/genome_guided/htseq_count/htseq_count_export/'
-
-'''
-snakemake --profile ../snakemake_profile \
-output/polyA/genome_guided/htseq_count/htseq_count_export/altadena_{bp_rep1,bp_rep2,bp_rep3,\
-hb101_rep1,hb101_rep2,hb101_rep3,\
-m9_rep1,m9_rep2,m9_rep3,\
-op50_rep1,op50_rep2,op50_rep3,\
-pf_rep1,pf_rep2,pf_rep3}_counts.txt \
-output/polyA/genome_guided/htseq_count/htseq_count_export/bristol_{bp_rep1,bp_rep2,bp_rep3,\
-hb101_rep1,hb101_rep2,hb101_rep3,\
-m9_rep1,m9_rep2,m9_rep3,\
-op50_rep1,op50_rep2,op50_rep3,\
-pf_rep1,pf_rep2,pf_rep3}_counts.txt
-'''
-
-'''
-scp -r sb2226@172.25.11.131:/mnt/home1/miska/sb2226/output/polyA/genome_guided/htseq_count/htseq_count_export
-/Users/Sarah/OneDrive/Documents/Uni/III/Project/from_cluster/htseq_count_export
-'''
-
-
-# was orginally run with -e option
 rule stringtie:
     ''' Assemble alignments into transcripts '''
     input:
@@ -187,6 +141,7 @@ output/polyA/genome_guided/stringtie/bristol/pf/rep3/bristol_pf_rep3.gtf
 '''
 
 rule stringtie_merge:
+    ''' Merge StringTie annotations across biological replicates '''
     input:
         rep1='output/polyA/genome_guided/stringtie/{location}/{diet}/rep1/{location}_{diet}_rep1.gtf',
         rep2='output/polyA/genome_guided/stringtie/{location}/{diet}/rep2/{location}_{diet}_rep2.gtf',
@@ -209,6 +164,7 @@ output/polyA/genome_guided/stringtie/altadena/pf/rep123/altadena_pf_rep123.gtf
 '''
 
 rule merge_stringtie_all:
+    ''' Merge StringTie annotations across diets '''
     input:
         expand('output/polyA/genome_guided/stringtie/{{location}}/{diet}/rep123/{{location}}_{diet}_rep123.gtf',
         diet = DIETS)
@@ -243,13 +199,54 @@ output/polyA/genome_guided/stringtie_export/altadena/pf/rep123/stringtie_altaden
 '''
 
 '''
-# export to local machine for analysis in R
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/as/rep2/bristol_as_rep2.gtf \
-sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/as/rep3/bristol_as_rep3.gtf \
-sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/m9/rep2/bristol_m9_rep2.gtf \
-sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/m9/rep3/bristol_m9_rep3.gtf .
+Export output/polyA/genome_guided/htseq_count/htseq_count_export/ to workflow/from_cluster
+on local machine
+'''
 
-scp sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/bristol/all/rep123/stringtie_bristol_all_rep123.gtf \
-sb2226@172.25.11.131:/mnt/home1/miska/sb2226/workflow/output/polyA/genome_guided/stringtie/altadena/all/rep123/stringtie_altadena_all_rep123.gtf .
+''' Count reads aligning to genes in liftover annotation. Not used in report '''
 
+rule htseq_count:
+    ''' Count reads mapping to each gene in liftover annotation '''
+    input:
+        bam='output/polyA/genome_guided/sorted_bam/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}.bam',
+        annotation='output/polyA/genome_guided/annotations/{location}/{location}_annotation.gtf'
+    output:
+        'output/polyA/genome_guided/htseq_count/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}_counts.txt'
+    conda:
+        '../envs/conda/htseq=0.12.4.yaml'
+    shell:
+        'htseq-count --stranded=reverse {input.bam} {input.annotation} > {output}'
+
+'''
+snakemake --profile ../snakemake_profile -R \
+output/polyA/genome_guided/htseq_count/altadena/as/rep1/altadena_as_rep1_counts.txt
+'''
+
+rule htseq_count_export:
+    ''' Moves count data to single file for export to local machine '''
+    input:
+        expand('output/polyA/genome_guided/htseq_count/{location}/{diet}/{replicate}/{location}_{diet}_{replicate}_counts.txt', \
+        location=LOCATIONS, diet=DIETS, replicate=REPLICATES)
+    output:
+        'output/polyA/genome_guided/htseq_count/htseq_count_export/{location}_{diet}_{replicate}_counts.txt'
+    shell:
+        'cp {input} output/polyA/genome_guided/htseq_count/htseq_count_export/'
+
+'''
+snakemake --profile ../snakemake_profile \
+output/polyA/genome_guided/htseq_count/htseq_count_export/altadena_{bp_rep1,bp_rep2,bp_rep3,\
+hb101_rep1,hb101_rep2,hb101_rep3,\
+m9_rep1,m9_rep2,m9_rep3,\
+op50_rep1,op50_rep2,op50_rep3,\
+pf_rep1,pf_rep2,pf_rep3}_counts.txt \
+output/polyA/genome_guided/htseq_count/htseq_count_export/bristol_{bp_rep1,bp_rep2,bp_rep3,\
+hb101_rep1,hb101_rep2,hb101_rep3,\
+m9_rep1,m9_rep2,m9_rep3,\
+op50_rep1,op50_rep2,op50_rep3,\
+pf_rep1,pf_rep2,pf_rep3}_counts.txt
+'''
+
+'''
+Export output/polyA/genome_guided/htseq_count/htseq_count_export/ to workflow/from_cluster
+on local machine
 '''

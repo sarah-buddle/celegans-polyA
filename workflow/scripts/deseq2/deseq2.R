@@ -1,7 +1,4 @@
-#### Creates DESeq2 objects for use in further analysis ####
-
-# Set working directory
-setwd('~/OneDrive/Documents/Uni/III/Project/github/celegans-polyA/workflow')
+#### Creates DESeq2 objects for use in further analysis for single location ####
 
 # Load packages
 library(DESeq2)
@@ -16,7 +13,7 @@ samples <- subset(samples, location == snakemake@wildcards$location)
 
 # Make DESeqDataSet object from HTSeq-count data
 
-full_dds <- DESeq2::DESeqDataSetFromHTSeqCount(samples, 'from_cluster/htseq_count_export', design = ~ diet)
+full_dds <- DESeq2::DESeqDataSetFromHTSeqCount(samples, 'from_cluster/htseq_count_export_combined', design = ~ diet)
 
 # Save resulting object
 saveRDS(full_dds, file = snakemake@output$full_dds)

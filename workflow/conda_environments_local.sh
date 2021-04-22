@@ -1,4 +1,5 @@
-# local machine (run from workflow folder)
+# conda environments needed for workflow on local machine
+
 # samtools
 conda create --name samtools=1.11 --channel conda-forge --channel bioconda --yes samtools=1.11
 conda activate samtools=1.11
@@ -97,4 +98,63 @@ conda deactivate
 conda create --name r-seqinr=3.4_5 --channel conda-forge --channel bioconda --yes r-seqinr=3.4_5
 conda activate r-seqinr=3.4_5
 conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/r-seqinr=3.4_5.yaml
+conda deactivate
+
+# rrvgo
+conda create --name bioconductor-rrvgo=1.2.0_bioconductor-org.ce.eg.db=3.12.0 \
+--channel conda-forge --channel bioconda --yes bioconductor-rrvgo=1.2.0 \
+bioconductor-org.ce.eg.db=3.12.0
+conda activate bioconductor-rrvgo=1.2.0_bioconductor-org.ce.eg.db=3.12.0
+conda env export --no-builds | sed '$d' | sed '$d' > envs/conda/bioconductor-rrvgo=1.2.0_bioconductor-org.ce.eg.db=3.12.0.yaml
+conda deactivate
+
+# rtracklayer, granges and plyranges
+conda create --name bioconductor-rtracklayer=1.50.0_bioconductor-genomicranges=1.42.0_bioconductor-plyranges=1.10.0 \
+--channel conda-forge --channel bioconda --yes bioconductor-rtracklayer=1.50.0 \
+bioconductor-genomicranges=1.42.0 bioconductor-plyranges=1.10.0
+conda activate bioconductor-rtracklayer=1.50.0_bioconductor-genomicranges=1.42.0_bioconductor-plyranges=1.10.0
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/bioconductor-rtracklayer=1.50.0_bioconductor-genomicranges=1.42.0_bioconductor-plyranges=1.10.0.yaml
+conda deactivate
+
+# rtracklayer, ggplot and plyranges
+conda create --name bioconductor-rtracklayer=1.50.0_r-ggplot2=3.3.1_bioconductor-plyranges=1.10.0 \
+--channel conda-forge --channel bioconda --yes bioconductor-rtracklayer=1.50.0 \
+r-ggplot2=3.3.1 bioconductor-plyranges=1.10.0
+conda activate bioconductor-rtracklayer=1.50.0_r-ggplot2=3.3.1_bioconductor-plyranges=1.10.0
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/bioconductor-rtracklayer=1.50.0_r-ggplot2=3.3.1_bioconductor-plyranges=1.10.0.yaml
+conda deactivate
+
+# deseq2 and plyranges
+conda create --name bioconductor-deseq2=1.30.0_bioconductor-plyranges=1.10.0 \
+--channel conda-forge --channel bioconda --yes bioconductor-deseq2=1.30.0 \
+bioconductor-plyranges=1.10.0
+conda activate bioconductor-deseq2=1.30.0_bioconductor-plyranges=1.10.0
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/bioconductor-deseq2=1.30.0_bioconductor-plyranges=1.10.0.yaml
+conda deactivate
+
+# ggplot2, rggpubr, gridextra
+conda create --name r-ggplot2=3.3.1_r-ggpubr=0.4.0_r-gridextra=2.3 \
+--channel conda-forge --channel bioconda --yes r-ggplot2=3.3.1 r-ggpubr=0.4.0 r-gridextra=2.3
+conda activate r-ggplot2=3.3.1_r-ggpubr=0.4.0_r-gridextra=2.3
+conda env export --no-builds | sed '$d' | sed '$d' > \
+r-ggplot2=3.3.1_rggpubr=0.4.0_r-gridextra=2.3.yaml
+conda deactivate
+
+# ggtree
+conda create --name bioconductor-ggtree=2.4.1 \
+--channel conda-forge --channel bioconda --yes bioconductor-ggtree=2.4.1
+conda activate bioconductor-ggtree=2.4.1
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/bioconductor-ggtree=2.4.1.yaml
+conda deactivate
+
+# tidyverse and rggpubr
+conda create --name r-tidyverse=1.2.1_r-ggpubr=0.4.0 \
+--channel conda-forge --channel bioconda --yes r-tidyverse=1.2.1 r-ggpubr=0.4.0
+conda activate r-tidyverse=1.2.1_r-ggpubr=0.4.0
+conda env export --no-builds | sed '$d' | sed '$d' > \
+envs/conda/r-tidyverse=1.2.1_r-ggpubr=0.4.0.yaml
 conda deactivate
