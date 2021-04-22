@@ -1,7 +1,18 @@
-include: 'rules/deseq2.smk'
-include: 'rules/deseq2_new.smk'
-include: 'rules/topgo.smk'
-
+# Produce combined annotations and identify new genes
 include: 'rules/annotations.smk'
 
+# Run differential expression analysis
+include: 'rules/deseq2.smk' # liftover annotations
+include: 'rules/deseq2_combined.smk' # combined annotations
+
+# Expression of new genes
+include: 'rules/annotations_expression.smk'
+
+# Gene ontology analysis of differentially expressed genes
+include: 'rules/topgo.smk'
+
+# BLAST analysis of new genes
+include: 'rules/blast.smk'
+
+# Prepare for visualisation in IGV
 include: 'rules/igv.smk'
