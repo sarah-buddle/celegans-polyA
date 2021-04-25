@@ -1,6 +1,6 @@
-# follow instructions on github account sent by Cristian
+# follow instructions at https://github.com/Snakemake-Profiles/slurm
 # profile_name: snakemake_profile
-# sbatch_defaults: account=sb2226
+# sbatch_defaults: account={account_name}
 # cluster_config: snakemake_profile/slurm.json (below)
 # Select advanced_argument_conversion: 1
 # cluster_name: (leave this blank)
@@ -17,7 +17,7 @@
         "job-name" : "{rule}{wildcards}",
         "output": "slurm/output/{rule}/{wildcards}.o",
         "error": "slurm/error/{rule}/{wildcards}.e",
-        "mail-user": "sb2226@cam.ac.uk",
+        "mail-user": {email_address},
         "mail-type": "ALL"
     }
 }
