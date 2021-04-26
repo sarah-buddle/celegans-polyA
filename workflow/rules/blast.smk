@@ -12,7 +12,7 @@ rule find_sequences:
     '''Makes fasta files of all the new genes'''
     input:
         script='scripts/blast/find_sequences.R',
-        allnewgenes=ancient('output/annotations/combined_annotations/combinedall/altadena/allnewgenes_altadena.rds'),
+        allnewgenes='output/annotations/combined_annotations/combinedall/altadena/allnewgenes_altadena.rds',
         genome=expand('input/genomes/{{location}}_genome_chr/{{location}}_genome_{chromosome}.fa', \
         chromosome = CHROMOSOMES)
     output:
@@ -23,8 +23,8 @@ rule find_sequences:
         '../scripts/blast/find_sequences.R'
 
 '''
-snakemake --cores 1 --use-conda -R \
-output/blast/new_gene_sequences/bristol/bristol.fa
+snakemake --cores 1 --use-conda -n --allowed-rules find_sequences \
+output/blast/new_gene_sequences/altadena/altadena.fa
 '''
 
 rule blast_new_sequences_genome:
@@ -42,7 +42,7 @@ rule blast_new_sequences_genome:
 
 '''
 snakemake --cores 1 --use-conda -R \
-output/blast/vc2010_genome_hits/altadena/vc2010_genome_hits_altadena.txt
+output/blast/vc2010_genome_hits/bristol/vc2010_genome_hits_bristol.txt
 '''
 
 rule extract_no_hits_genome:
@@ -56,7 +56,7 @@ rule extract_no_hits_genome:
 
 '''
 snakemake --cores 1 --use-conda -R \
-output/blast/vc2010_genome_no_hits/altadena/vc2010_genome_no_hits_altadena.txt
+output/blast/vc2010_genome_no_hits/bristol/vc2010_genome_no_hits_bristol.txt
 '''
 
 rule no_hits_list_genome:
@@ -71,6 +71,78 @@ rule no_hits_list_genome:
 '''
 snakemake --cores 1 --use-conda \
 output/blast/vc2010_genome_no_hits/altadena/names_vc2010_genome_no_hits_altadena.txt
+'''
+
+rule no_hits_sequences_genome:
+    ''' Find sequences of genes with no hits to VC2010 genome '''
+    input:
+        script='scripts/blast/no_hits_sequences.R',
+        no_hits_names='output/blast/vc2010_genome_no_hits/{location}/names_vc2010_genome_no_hits_{location}.txt',
+        sequences='output/blast/new_gene_sequences/{location}/{location}.fa'
+    output:
+        no_hits='output/blast/vc2010_genome_no_hits/{location}/vc2010_genome_no_hits_{location}.fa'
+    conda:
+        '../envs/conda/r-seqinr=3.4_5.yaml'
+    script:
+        '../scripts/blast/no_hits_sequences.R'
+
+'''
+snakemake --cores 1 --use-conda -R \
+output/blast/vc2010_genome_no_hits/bristol/vc2010_genome_no_hits_bristol.fa
+'''
+
+rule blast_new_sequences_genome_related_species:
+    ''' Blast new sequence against genome from related species '''
+    input:
+        sequences='output/blast/vc2010_genome_no_hits/{location}/vc2010_genome_no_hits_{location}.fa',
+        genome='input/genomes/related_species/c_{species}.WS279.genomic.fa'
+    output:
+        'output/blast/related_species_genome/{location}/c.{species}/{location}_c.{species}_genome.txt'
+    conda:
+        '../envs/conda/blast=2.10.1.yaml'
+    shell:
+        'blastn -query {input.sequences} -subject {input.genome} \
+        -outfmt 7 -out {output}'
+
+'''
+snakemake --cores 1 --use-conda -n \
+output/blast/related_species_genome/altadena/c.brenneri.PRJNA20035/altadena_c.brenneri.PRJNA20035_genome.txt \
+output/blast/related_species_genome/altadena/c.briggsae.PRJNA10731/altadena_c.briggsae.PRJNA10731_genome.txt \
+output/blast/related_species_genome/altadena/c.inopinata.PRJDB5687/altadena_c.inopinata.PRJDB5687_genome.txt \
+output/blast/related_species_genome/altadena/c.latens.PRJNA248912/altadena_c.latens.PRJNA248912_genome.txt \
+output/blast/related_species_genome/altadena/c.nigoni.PRJNA384657/altadena_c.nigoni.PRJNA384657_genome.txt \
+output/blast/related_species_genome/altadena/c.remanei.PRJNA53967/altadena_c.remanei.PRJNA53967_genome.txt \
+output/blast/related_species_genome/altadena/c.sinica.PRJNA194557/altadena_c.sinica.PRJNA194557_genome.txt \
+output/blast/related_species_genome/altadena/c.tropicalis.PRJNA53597/altadena_c.tropicalis.PRJNA53597_genome.txt
+'''
+
+rule extract_hits_related_species_genome:
+    ''' Extract hits from above '''
+    input:
+        expand('output/blast/related_species_genome/{{location}}/c.{species}/{{location}}_c.{species}_genome.txt', \
+        species = SPECIES)
+    output:
+        'output/blast/related_species_genome/{location}/related_species_genome_hits_{location}.txt'
+    shell:
+        "grep -r -v '#' {input} > {output}"
+
+'''
+snakemake --cores 1 --use-conda \
+output/blast/related_species_genome/bristol/related_species_genome_hits_bristol.txt
+'''
+
+rule hits_related_species_list_genome:
+    ''' Extract gene names from above '''
+    input:
+        'output/blast/related_species_genome/{location}/related_species_genome_hits_{location}.txt'
+    output:
+        'output/blast/related_species_genome/{location}/names_related_species_genome_hits_{location}.txt'
+    shell:
+        """cut -f1 {input} | cut -d ":" -f2 | awk '!seen[$0]++' > {output}"""
+
+'''
+snakemake --cores 1 --use-conda -n \
+output/blast/related_species_genome/altadena/names_related_species_genome_hits_altadena.txt
 '''
 
 rule blast_new_sequences_transcripts:
@@ -185,14 +257,12 @@ rule hits_related_species_list_transcripts:
     output:
         'output/blast/related_species_transcripts/{location}/names_related_species_transcripts_hits_{location}.txt'
     shell:
-        """cut -f1 {input} | cut -d ":" -f2 > {output}"""
+        """cut -f1 {input} | cut -d ":" -f2 | awk '!seen[$0]++' > {output}"""
 
 '''
-snakemake --cores 1 --use-conda \
+snakemake --cores 1 --use-conda -n -R --allowed-rules hits_related_species_list_transcripts \
 output/blast/related_species_transcripts/altadena/names_related_species_transcripts_hits_altadena.txt
 '''
-
-
 
 rule blast_new_sequences_proteins:
     ''' Blast new sequence against reference proteins '''
@@ -304,7 +374,7 @@ rule hits_related_species_list_proteins:
     output:
         'output/blast/related_species_proteins/{location}/names_related_species_proteins_hits_{location}.txt'
     shell:
-        """cut -f1 {input} | cut -d ":" -f2 > {output}"""
+        """cut -f1 {input} | cut -d ":" -f2 | awk '!seen[$0]++' > {output}"""
 
 '''
 snakemake --cores 1 --use-conda \
@@ -319,7 +389,9 @@ rule venn:
         no_hits_genome='output/blast/vc2010_genome_no_hits/{location}/names_vc2010_genome_no_hits_{location}.txt',
         no_hits_transcripts='output/blast/vc2010_transcripts_no_hits/{location}/names_vc2010_transcripts_no_hits_{location}.txt',
         no_hits_proteins='output/blast/vc2010_proteins_no_hits/{location}/names_vc2010_proteins_no_hits_{location}.txt',
-        hits_related_species='output/blast/related_species_transcripts/{location}/names_related_species_transcripts_hits_{location}.txt'
+        hits_related_species_genome='output/blast/related_species_genome/{location}/names_related_species_genome_hits_{location}.txt',
+        hits_related_species_transcripts='output/blast/related_species_transcripts/{location}/names_related_species_transcripts_hits_{location}.txt',
+        hits_related_species_proteins='output/blast/related_species_proteins/{location}/names_related_species_proteins_hits_{location}.txt',
     output:
         venn='output/blast/venn/{location}/venn_{location}.tiff',
         legend='output/blast/venn/{location}/venn_legend_{location}.tiff'
