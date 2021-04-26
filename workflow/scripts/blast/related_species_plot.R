@@ -13,10 +13,13 @@ counts_altadena <- readRDS(snakemake@input$counts_altadena) %>%
 
 # Combine
 counts <- rbind(counts_bristol, counts_altadena) %>%
-  subset(type == 'hits_related_species_proteins' | type == 'hits_related_species_transcripts')
+  subset(type == 'hits_related_species_genome' |
+        type == 'hits_related_species_proteins' |
+         type == 'hits_related_species_transcripts')
 
 # Reorder
-counts$type <- factor(counts$type, levels = c('hits_related_species_transcripts',
+counts$type <- factor(counts$type, levels = c('hits_related_species_genome',
+                                              'hits_related_species_transcripts',
                                               'hits_related_species_proteins'))
 
 counts$expressed <- factor(counts$expressed, levels = c('low_expression', 'expressed'))
@@ -24,7 +27,7 @@ counts$expressed <- factor(counts$expressed, levels = c('low_expression', 'expre
 counts$location <- factor(counts$location, levels = c('bristol', 'altadena'))
 
 # Labels
-x_labels <- c('Transcripts', 'Proteins')
+x_labels <- c('Genome', 'Transcripts', 'Proteins')
 legend_labels <- c('Very low expression', 'Higher expression')
 
 locations <- c('N2', 'PS2025')
