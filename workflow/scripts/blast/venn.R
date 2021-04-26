@@ -25,6 +25,14 @@ no_hits_transcripts <- read.table(snakemake@input$no_hits_transcripts) %>%
 no_hits_proteins <- read.table(snakemake@input$no_hits_proteins) %>%
   dplyr::rename(gene_id = V1)
 
+# hits_related_species_genome <- read.table('output/blast/related_species_genome/bristol/names_related_species_genome_hits_bristol.txt') %>%
+if(snakemake@wildcards$location == 'altadena') {
+  hits_related_species <- read.table(snakemake@input$hits_related_species) %>%
+  dplyr::rename(gene_id = V1)
+}else if(snakemake@wildcards$location == 'bristol')
+  hits_related_species_genome <- data.frame(gene_id = character(0))
+}
+
 # hits_related_species_transcripts <- read.table('output/blast/related_species_transcripts/bristol/names_related_species_transcripts_hits_bristol.txt') %>%
 hits_related_species <- read.table(snakemake@input$hits_related_species) %>%
   dplyr::rename(gene_id = V1)
@@ -52,16 +60,18 @@ new_gene_counts_adj <- new_gene_counts %>%
   mutate(no_hits_genome = gene_id %in% no_hits_genome$gene_id) %>%
   mutate(no_hits_transcripts = gene_id %in% no_hits_transcripts$gene_id) %>%
   mutate(no_hits_proteins = gene_id %in% no_hits_proteins$gene_id) %>%
+  mutate(hits_related_species_genome = gene_id %in% hits_related_species_genome$gene_id) %>%
   mutate(hits_related_species_transcripts = gene_id %in% hits_related_species_transcripts$gene_id) %>%
   mutate(hits_related_species_proteins = gene_id %in% hits_related_species_proteins$gene_id)
 
 # Make table
 
 type <- rep(c('all_new_genes', 'no_hits_genome', 'no_hits_transcripts',
-           'no_hits_proteins', 'hits_related_species_transcripts',
+           'no_hits_proteins', 'hits_related_species_genome',
+           'hits_related_species_transcripts',
            'hits_related_species_proteins'), each = 2)
 
-expressed <- rep(c('expressed', 'low_expression'), times = 6)
+expressed <- rep(c('expressed', 'low_expression'), times = 7)
 
 gene_counts <- c(nrow(subset(new_gene_counts_adj, expressed == TRUE)),
                  nrow(subset(new_gene_counts_adj, expressed == FALSE)),
@@ -71,6 +81,8 @@ gene_counts <- c(nrow(subset(new_gene_counts_adj, expressed == TRUE)),
                  nrow(subset(new_gene_counts_adj, expressed == FALSE & no_hits_transcripts == TRUE )),
                  nrow(subset(new_gene_counts_adj, expressed == TRUE & no_hits_proteins == TRUE )),
                  nrow(subset(new_gene_counts_adj, expressed == FALSE & no_hits_proteins == TRUE )),
+                 nrow(subset(new_gene_counts_adj, expressed == TRUE & hits_related_species_genome == TRUE )),
+                 nrow(subset(new_gene_counts_adj, expressed == FALSE & hits_related_species_genome == TRUE )),
                  nrow(subset(new_gene_counts_adj, expressed == TRUE & hits_related_species_transcripts == TRUE )),
                  nrow(subset(new_gene_counts_adj, expressed == FALSE & hits_related_species_transcripts == TRUE )),
                  nrow(subset(new_gene_counts_adj, expressed == TRUE & hits_related_species_proteins == TRUE )),
